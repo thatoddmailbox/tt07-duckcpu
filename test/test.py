@@ -161,4 +161,4 @@ async def test_opcode(dut):
 			dut._log.info(f"Testing instruction {full_name} ({memory_dump}): fail")
 
 		# break
-	dut._log.info(f"Passed {pass_count}/{len(opcodes["unprefixed"])} instructions")
+	dut._log.info(f"Passed {pass_count}/{len(opcodes['unprefixed'])} instructions")
