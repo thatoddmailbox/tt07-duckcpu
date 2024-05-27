@@ -41,6 +41,12 @@ module soc(
 					bus_data_in <= 8'h55;
 				end else if (bus_address_out == 16'd2) begin
 					bus_data_in <= 8'h3C; // INC A
+				end else if (bus_address_out == 16'd3) begin
+					bus_data_in <= 8'hC3; // JP a16
+				end else if (bus_address_out == 16'd4) begin
+					bus_data_in <= 8'hBB; // lower byte
+				end else if (bus_address_out == 16'd5) begin
+					bus_data_in <= 8'hAA; // upper byte
 				end else begin
 					bus_data_in <= 8'h00; // NOP
 				end

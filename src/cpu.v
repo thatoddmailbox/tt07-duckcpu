@@ -73,6 +73,8 @@ module cpu(
 	assign bus_read = want_bus_read;
 	assign bus_write = want_bus_write;
 
+	reg [7:0] lower_byte;
+
 	// Table "r"
 	// Index	0	1	2	3	4	5	6	7
 	// Value	B	C	D	E	H	L	(HL)	A
@@ -123,6 +125,8 @@ module cpu(
 			bus_data_out <= 8'h00;
 			want_bus_read <= 0;
 			want_bus_write <= 0;
+
+			lower_byte <= 8'h00;
 
 			target_register <= 3'd0;
 			op <= 3'd0;
@@ -187,31 +191,19 @@ module cpu(
 						op <= `OP_LD;
 						state <= `STATE_DATA_L_FETCH;
 
-						$display("state is data_l_fetch");
-
 						target_register <= insn_y;
 					end else begin
 						state <= `STATE_INSN_FETCH;
 					end
 				end else if (insn_x == 2'd3) begin
 					if (insn_z == 3'd3) begin
-						// if (insn_y == 3'd0) begin
-						// 	// JP nn
-
-						// 	// ok, we need to read the next two bytes
-						// 	is_jump <= 1;
-						// 	longread_active <= 1;
-						// 	longread_upper <= 1;
-						// 	longread_upper_data <= 8'h00;
-
-						// 	register_PC <= register_PC + 1;
-						// 	bus_address_out <= register_PC;
-						// 	bus_read <= 1;
-						// 	state <= `STATE_WAIT_FOR_BUS_DATA;
-						// end else begin
-						// 	state <= `STATE_INSN_FETCH;
-						// end
-						state <= `STATE_INSN_FETCH;
+						if (insn_y == 3'd0) begin
+							// JP nn
+							op <= `OP_JP;
+							state <= `STATE_DATA_L_FETCH;
+						end else begin
+							state <= `STATE_INSN_FETCH;
+						end
 					end else begin
 						state <= `STATE_INSN_FETCH;
 					end
@@ -229,10 +221,31 @@ module cpu(
 					// wait for the bus to be ready
 				end else begin
 					// we have the data
-					state <= `STATE_EXECUTE;
+					want_bus_read <= 0;
+
+					if (op == `OP_JP) begin
+						// need the upper byte, too
+						state <= `STATE_DATA_H_FETCH;
+						lower_byte <= bus_data_in;
+					end else begin
+						// move to execute stage
+						state <= `STATE_EXECUTE;
+					end
 				end
 			end else if (state == `STATE_DATA_H_FETCH) begin
-
+				$display("STATE_DATA_H_FETCH");
+				if (!want_bus_read) begin
+					// fetch the next byte
+					bus_address_out <= register_PC;
+					want_bus_read <= 1;
+					register_PC <= register_PC + 1;
+				end else if (bus_wait) begin
+					// wait for the bus to be ready
+				end else begin
+					// we have the data
+					want_bus_read <= 0;
+					state <= `STATE_EXECUTE;
+				end
 			end else if (state == `STATE_EXECUTE) begin
 				// instruction gets executed
 
@@ -272,6 +285,8 @@ module cpu(
 					state <= `STATE_INSN_FETCH;
 				end else if (op == `OP_JP) begin
 					// jump to the address
+
+					register_PC <= {bus_data_in, lower_byte};
 				end
 			end else if (state == `STATE_WRITE) begin
 				// write back to memory
