@@ -41,4 +41,23 @@ module tb ();
       .rst_n  (rst_n)     // not reset
   );
 
+  wire [15:0] bus_address_out;
+	wire [7:0] bus_data_out;
+	reg [7:0] bus_data_in;
+	wire bus_read;
+	wire bus_write;
+	reg bus_done;
+
+  cpu cpu_inst(
+    .clk(clk),
+    .rst_n(rst_n),
+
+    .bus_address_out(bus_address_out),
+    .bus_data_out(bus_data_out),
+    .bus_data_in(bus_data_in),
+    .bus_read(bus_read),
+    .bus_write(bus_write),
+    .bus_done(bus_done)
+  );
+
 endmodule
