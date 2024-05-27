@@ -39,6 +39,11 @@ module cpu(
 
 	reg [7:0] current_insn;
 
+`ifdef SIM
+	// provides current_insn_name
+	`include "instruction_dbg.vh"
+`endif
+
 	wire [1:0] insn_x;
 	wire [2:0] insn_y;
 	wire [2:0] insn_z;
@@ -164,6 +169,10 @@ module cpu(
 
 				$display("decoding instruction: %b", current_insn);
 				$display("decoded instruction: %b %b %b", insn_x, insn_y, insn_z);
+
+`ifdef SIM
+				$display("instruction name: %s", current_insn_name);
+`endif
 
 				if (insn_x == 2'd0) begin
 					if (insn_z == 3'd0) begin
