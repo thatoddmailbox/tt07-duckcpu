@@ -64,7 +64,7 @@ async def test_opcode(dut):
 		for i, operand in enumerate(operands):
 			if i != 0:
 				full_name += ","
-			full_name += f" {operand["name"]}"
+			full_name += f" {operand['name']}"
 
 			if "bytes" in operand:
 				for j in range(operand["bytes"]):
