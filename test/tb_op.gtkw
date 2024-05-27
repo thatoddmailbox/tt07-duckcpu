@@ -36,7 +36,7 @@ tb.cpu_inst.bus_read
 -CPU registers
 @22
 tb.cpu_inst.register_A[7:0]
-tb.cpu_inst.register_IP[15:0]
+tb.cpu_inst.register_PC[15:0]
 @200
 -CPU internal state
 @28

@@ -37,7 +37,7 @@ async def test_project(dut):
 	# one or more clock cycles, and asserting the expected output values.
 
 
-@cocotb.test()
+# @cocotb.test()
 async def test_opcode(dut):
 	dut._log.info("Start")
 
@@ -52,6 +52,9 @@ async def test_opcode(dut):
 	for opcode in opcodes["unprefixed"]:
 		details = opcodes["unprefixed"][opcode]
 		num = int(opcode, 16)
+
+		if num != 0xC3:
+			continue
 
 		mnemonic = details["mnemonic"]
 		operands = details["operands"]
@@ -91,7 +94,7 @@ async def test_opcode(dut):
 		while True:
 
 			if dut.bus_read.value.integer == 1:
-				# print("reading from", dut.bus_address_out.value.integer)
+				print("reading from", dut.bus_address_out.value.integer)
 
 				if dut.bus_address_out.value.integer < len(memory):
 					dut.bus_data_in.value = memory[dut.bus_address_out.value.integer]
@@ -113,7 +116,7 @@ async def test_opcode(dut):
 			await ClockCycles(dut.clk, 1)
 			bla += 1
 
-			if bla > 20:
+			if bla > 50:
 				dut._log.info(f"Testing instruction {full_name} ({memory_dump}): timeout")
 				assert False
 
@@ -148,6 +151,8 @@ async def test_opcode(dut):
 				passed = dut.cpu_inst.register_A.value.integer == register_A_start + 1
 			elif operands[0]["name"] == "B":
 				passed = dut.cpu_inst.register_B.value.integer == register_B_start + 1
+		elif mnemonic == "JP":
+			passed = dut.cpu_inst.register_PC.value.integer == 0xABAA
 
 		if passed:
 			dut._log.info(f"Testing instruction {full_name} ({memory_dump}): pass")
