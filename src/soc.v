@@ -42,7 +42,15 @@ module soc(
 					// read from bus
 
 					// TODO: something more fun
-					bus_data_in <= 8'h3E; // LD A, d8
+					if (bus_address_out == 16'd0) begin
+						bus_data_in <= 8'h3E; // LD A, d8
+					end else if (bus_address_out == 16'd1) begin
+						bus_data_in <= 8'h55;
+					end else if (bus_address_out == 16'd2) begin
+						bus_data_in <= 8'h3C; // INC A
+					end else begin
+						bus_data_in <= 8'h00; // NOP
+					end
 					bus_done <= 1;
 
 					waiting_for_bus_completion <= 1;

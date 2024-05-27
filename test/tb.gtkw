@@ -1,14 +1,14 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Mon May 27 05:10:23 2024
+[*] Mon May 27 05:38:03 2024
 [*]
 [dumpfile] "/home/alex/Documents/GitHub/tt07-duckcpu/test/tb.vcd"
-[dumpfile_mtime] "Mon May 27 05:05:19 2024"
-[dumpfile_size] 2739
+[dumpfile_mtime] "Mon May 27 05:37:36 2024"
+[dumpfile_size] 4067
 [savefile] "/home/alex/Documents/GitHub/tt07-duckcpu/test/tb.gtkw"
-[timestart] 0
+[timestart] 57600000
 [size] 1840 795
-[pos] -1 -1
+[pos] 175 -38
 *-24.534533 77800000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] tb.
 [treeopen] tb.user_project.
@@ -64,9 +64,18 @@ tb.user_project.soc_inst.cpu_inst.insn_y[2:0]
 (0)tb.user_project.soc_inst.cpu_inst.insn_y[2:0]
 (1)tb.user_project.soc_inst.cpu_inst.insn_y[2:0]
 (2)tb.user_project.soc_inst.cpu_inst.insn_y[2:0]
-@1401204
+@1401200
 -group_end
 @24
 tb.user_project.soc_inst.cpu_inst.insn_z[2:0]
+@200
+-ALU internal state
+@22
+tb.user_project.soc_inst.cpu_inst.alu_inst.operand_a[7:0]
+tb.user_project.soc_inst.cpu_inst.alu_inst.operand_b[7:0]
+@28
+tb.user_project.soc_inst.cpu_inst.alu_inst.operator[2:0]
+@23
+tb.user_project.soc_inst.cpu_inst.alu_inst.result[7:0]
 [pattern_trace] 1
 [pattern_trace] 0
