@@ -75,6 +75,8 @@ module cpu(
 	reg [7:0] alu_operand_b;
 	reg [2:0] alu_operator;
 	wire [7:0] alu_result;
+	wire alu_flag_zero;
+	wire alu_flag_carry;
 
 	alu alu_inst(
 		.clk(clk),
@@ -85,7 +87,10 @@ module cpu(
 
 		.operator(alu_operator),
 
-		.result(alu_result)
+		.result(alu_result),
+
+		.flag_zero(alu_flag_zero),
+		.flag_carry(alu_flag_carry)
 	);
 
 	//
