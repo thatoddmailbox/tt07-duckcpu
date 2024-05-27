@@ -73,10 +73,10 @@ module cpu(
 	// 2 = NC
 	// 3 = C
 	wire insn_cc_true;
-	assign insn_cc_true = (insn_y == 2'd0) ? !alu_flag_zero :
-							(insn_y == 2'd1) ? alu_flag_zero :
-							(insn_y == 2'd2) ? !alu_flag_carry :
-							(insn_y == 2'd3) ? alu_flag_carry : 0;
+	assign insn_cc_true = (insn_y == 3'd0) ? !alu_flag_zero :
+							(insn_y == 3'd1) ? alu_flag_zero :
+							(insn_y == 3'd2) ? !alu_flag_carry :
+							(insn_y == 3'd3) ? alu_flag_carry : 0;
 
 	//
 	// data pipeline

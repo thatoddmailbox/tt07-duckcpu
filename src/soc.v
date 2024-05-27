@@ -10,7 +10,6 @@ module soc(
 	reg [7:0] bus_data_in;
 	wire bus_read;
 	wire bus_write;
-	reg bus_wait;
 
 	reg bus_completed;
 
@@ -28,7 +27,6 @@ module soc(
 	always @(posedge clk) begin
 		if (!rst_n) begin
 			// reset stuff
-			bus_wait <= 0;
 			bus_completed <= 0;
 		end else begin
 			if (bus_read) begin
