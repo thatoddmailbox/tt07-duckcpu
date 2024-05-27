@@ -14,6 +14,9 @@
 `define OP_ALU 3'b010
 `define OP_JP 3'b011
 
+`define SUBOP_LD_BUS 2'b00
+`define SUBOP_LD_REGZ 2'b01
+
 module cpu(
 	input wire clk,
 	input wire rst_n,
@@ -30,6 +33,8 @@ module cpu(
 
 	reg [7:0] register_A;
 	reg [7:0] register_B;
+	reg [7:0] register_H;
+	reg [7:0] register_L;
 
 	reg [15:0] register_PC;
 
@@ -56,16 +61,27 @@ module cpu(
 	);
 
 	wire [7:0] insn_y_register_value;
+	wire [7:0] insn_z_register_value;
+
 	// TODO: many registers missing
 	// TODO: [HL] is not implemented
 	assign insn_y_register_value = (insn_y == 3'd0) ? register_B :
 	                                (insn_y == 3'd1) ? 8'hBB : //register_C :
 	                                (insn_y == 3'd2) ? 8'hBB : //register_D :
 	                                (insn_y == 3'd3) ? 8'hBB : //register_E :
-	                                (insn_y == 3'd4) ? 8'hBB : //register_H :
-	                                (insn_y == 3'd5) ? 8'hBB : //register_L :
+	                                (insn_y == 3'd4) ? register_H :
+	                                (insn_y == 3'd5) ? register_L :
 	                                (insn_y == 3'd6) ? 8'hAA :
 	                                (insn_y == 3'd7) ? register_A :
+	                                8'h00;
+	assign insn_z_register_value = (insn_z == 3'd0) ? register_B :
+	                                (insn_z == 3'd1) ? 8'hBB : //register_C :
+	                                (insn_z == 3'd2) ? 8'hBB : //register_D :
+	                                (insn_z == 3'd3) ? 8'hBB : //register_E :
+	                                (insn_z == 3'd4) ? register_H :
+	                                (insn_z == 3'd5) ? register_L :
+	                                (insn_z == 3'd6) ? 8'hAA :
+	                                (insn_z == 3'd7) ? register_A :
 	                                8'h00;
 
 	// 0 = NZ
@@ -96,6 +112,11 @@ module cpu(
 	reg [2:0] target_register;
 
 	reg [2:0] op;
+	reg [1:0] subop;
+
+	wire [7:0] ld_input = (subop == `SUBOP_LD_BUS) ? bus_data_in :
+	                      (subop == `SUBOP_LD_REGZ) ? insn_z_register_value :
+	                      8'h00;
 
 	//
 	// alu
@@ -134,6 +155,8 @@ module cpu(
 			state <= `STATE_INSN_FETCH;
 			register_A <= 8'h00;
 			register_B <= 8'h00;
+			register_H <= 8'h00;
+			register_L <= 8'h00;
 			register_PC <= 16'h0000;
 
 			bus_address_out <= 16'h0000;
@@ -145,6 +168,7 @@ module cpu(
 
 			target_register <= 3'd0;
 			op <= 3'd0;
+			subop <= 2'd0;
 
 			alu_operand_a <= 8'h00;
 			alu_operand_b <= 8'h00;
@@ -216,15 +240,21 @@ module cpu(
 					end else if (insn_z == 3'd6) begin
 						// LD r[y], n
 
-						$display("it's a load");
-
 						op <= `OP_LD;
+						subop <= `SUBOP_LD_BUS;
 						state <= `STATE_DATA_L_FETCH;
 
 						target_register <= insn_y;
 					end else begin
 						state <= `STATE_INSN_FETCH;
 					end
+				end else if (insn_x == 2'd1) begin
+					// LD r[y], r[z]
+
+					op <= `OP_LD;
+					subop <= `SUBOP_LD_REGZ;
+					state <= `STATE_EXECUTE;
+					target_register <= insn_y;
 				end else if (insn_x == 2'd3) begin
 					if (insn_z == 3'd2) begin
 						// JP cc[y], nn
@@ -291,22 +321,32 @@ module cpu(
 
 				if (op == `OP_NOP) begin
 					// do nothing
+					state <= `STATE_INSN_FETCH;
 				end else if (op == `OP_LD) begin
 					// load the data into the target register
 
 					// TODO: probably other stuff could happen here?
 					case (target_register)
-						3'd0: register_B <= bus_data_in;
-						// 3'd1: register_C <= bus_data_in;
-						// 3'd2: register_D <= bus_data_in;
-						// 3'd3: register_E <= bus_data_in;
-						// 3'd4: register_H <= bus_data_in;
-						// 3'd5: register_L <= bus_data_in;
-						// TODO: what about [HL]?
-						3'd7: register_A <= bus_data_in;
+						3'd0: register_B <= ld_input;
+						// 3'd1: register_C <= ld_input;
+						// 3'd2: register_D <= ld_input;
+						// 3'd3: register_E <= ld_input;
+						3'd4: register_H <= ld_input;
+						3'd5: register_L <= ld_input;
+						3'd6: begin
+							// writing to [HL]
+							bus_address_out <= {register_H, register_L};
+							bus_data_out <= ld_input;
+							want_bus_write <= 1;
+						end
+						3'd7: register_A <= ld_input;
 					endcase
 
-					state <= `STATE_INSN_FETCH;
+					if (target_register == 3'd6) begin
+						state <= `STATE_WRITE;
+					end else begin
+						state <= `STATE_INSN_FETCH;
+					end
 				end else if (op == `OP_ALU) begin
 					// do the alu operation
 
@@ -316,20 +356,37 @@ module cpu(
 						// 3'd1: register_C <= alu_result;
 						// 3'd2: register_D <= alu_result;
 						// 3'd3: register_E <= alu_result;
-						// 3'd4: register_H <= alu_result;
-						// 3'd5: register_L <= alu_result;
-						// TODO: what about [HL]?
+						3'd4: register_H <= alu_result;
+						3'd5: register_L <= alu_result;
+						3'd6: begin
+							// writing to [HL]
+							bus_address_out <= {register_H, register_L};
+							bus_data_out <= alu_result;
+							want_bus_write <= 1;
+						end
 						3'd7: register_A <= alu_result;
 					endcase
 
-					state <= `STATE_INSN_FETCH;
+					if (target_register == 3'd6) begin
+						state <= `STATE_WRITE;
+					end else begin
+						state <= `STATE_INSN_FETCH;
+					end
 				end else if (op == `OP_JP) begin
 					// jump to the address
 					register_PC <= {bus_data_in, lower_byte};
 					state <= `STATE_INSN_FETCH;
 				end
 			end else if (state == `STATE_WRITE) begin
+				$display("writing");
 				// write back to memory
+				if (bus_wait) begin
+					// wait for the bus to be ready
+				end else begin
+					// we have written the data
+					want_bus_write <= 0;
+					state <= `STATE_INSN_FETCH;
+				end
 			end
 		end
 	end

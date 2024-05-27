@@ -38,12 +38,22 @@ module soc(
 				end else if (bus_address_out == 16'd1) begin
 					bus_data_in <= 8'h3;
 				end else if (bus_address_out == 16'd2) begin
-					bus_data_in <= 8'h3D; // DEC A
+					bus_data_in <= 8'h26; // LD H, d8
 				end else if (bus_address_out == 16'd3) begin
-					bus_data_in <= 8'hC2; // JP nz, a16
+					bus_data_in <= 8'hFF;
 				end else if (bus_address_out == 16'd4) begin
-					bus_data_in <= 8'h02; // lower byte
+					bus_data_in <= 8'h2E; // LD L, d8
 				end else if (bus_address_out == 16'd5) begin
+					bus_data_in <= 8'h00;
+				end else if (bus_address_out == 16'd6) begin
+					bus_data_in <= 8'h3D; // DEC A
+				end else if (bus_address_out == 16'd7) begin
+					bus_data_in <= 8'h77; // LD [HL], A
+				end else if (bus_address_out == 16'd8) begin
+					bus_data_in <= 8'hC2; // JP nz, a16
+				end else if (bus_address_out == 16'd9) begin
+					bus_data_in <= 8'h06; // lower byte
+				end else if (bus_address_out == 16'd10) begin
 					bus_data_in <= 8'h00; // upper byte
 				end else begin
 					bus_data_in <= 8'h00; // NOP

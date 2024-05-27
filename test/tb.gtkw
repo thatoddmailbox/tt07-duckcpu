@@ -1,14 +1,14 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Mon May 27 07:32:19 2024
+[*] Mon May 27 17:44:32 2024
 [*]
 [dumpfile] "/home/alex/Documents/GitHub/tt07-duckcpu/test/tb.vcd"
-[dumpfile_mtime] "Mon May 27 07:32:11 2024"
-[dumpfile_size] 5658
+[dumpfile_mtime] "Mon May 27 17:43:35 2024"
+[dumpfile_size] 11053
 [savefile] "/home/alex/Documents/GitHub/tt07-duckcpu/test/tb.gtkw"
-[timestart] 57600000
-[size] 1840 795
-[pos] 318 27
+[timestart] 300300000
+[size] 1840 909
+[pos] 2059 159
 *-24.534533 77800000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] tb.
 [treeopen] tb.user_project.
@@ -17,7 +17,7 @@
 [sst_width] 297
 [signals_width] 230
 [sst_expanded] 1
-[sst_vpaned_height] 231
+[sst_vpaned_height] 274
 @28
 tb.user_project.ena
 tb.user_project.clk
@@ -44,6 +44,7 @@ tb.user_project.soc_inst.cpu_inst.bus_data_in[7:0]
 tb.user_project.soc_inst.cpu_inst.bus_data_out[7:0]
 @28
 tb.user_project.soc_inst.cpu_inst.bus_read
+tb.user_project.soc_inst.bus_write
 @200
 -CPU registers
 @22
@@ -53,8 +54,12 @@ tb.user_project.soc_inst.cpu_inst.register_PC[15:0]
 -CPU internal state
 @28
 tb.user_project.soc_inst.cpu_inst.state[2:0]
+tb.user_project.soc_inst.cpu_inst.op[2:0]
+tb.user_project.soc_inst.cpu_inst.subop[1:0]
 @22
 tb.user_project.soc_inst.cpu_inst.current_insn[7:0]
+@820
+tb.user_project.soc_inst.cpu_inst.current_insn_name[127:0]
 @24
 tb.user_project.soc_inst.cpu_inst.insn_x[1:0]
 @c00024
@@ -67,6 +72,10 @@ tb.user_project.soc_inst.cpu_inst.insn_y[2:0]
 -group_end
 @24
 tb.user_project.soc_inst.cpu_inst.insn_z[2:0]
+@28
+tb.user_project.soc_inst.cpu_inst.insn_cc_true
+@25
+tb.user_project.soc_inst.cpu_inst.target_register[2:0]
 @200
 -ALU internal state
 @22
@@ -74,7 +83,7 @@ tb.user_project.soc_inst.cpu_inst.alu_inst.operand_a[7:0]
 tb.user_project.soc_inst.cpu_inst.alu_inst.operand_b[7:0]
 @28
 tb.user_project.soc_inst.cpu_inst.alu_inst.operator[2:0]
-@23
+@22
 tb.user_project.soc_inst.cpu_inst.alu_inst.result[7:0]
 [pattern_trace] 1
 [pattern_trace] 0
