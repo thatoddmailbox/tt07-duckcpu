@@ -42,7 +42,7 @@ module soc(
 					// read from bus
 
 					// TODO: something more fun
-					bus_data_in <= 8'h00;
+					bus_data_in <= 8'h3E; // LD A, d8
 					bus_done <= 1;
 
 					waiting_for_bus_completion <= 1;
