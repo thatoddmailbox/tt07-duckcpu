@@ -68,6 +68,16 @@ module cpu(
 	                                (insn_y == 3'd7) ? register_A :
 	                                8'h00;
 
+	// 0 = NZ
+	// 1 = Z
+	// 2 = NC
+	// 3 = C
+	wire insn_cc_true;
+	assign insn_cc_true = (insn_y == 2'd0) ? !alu_flag_zero :
+							(insn_y == 2'd1) ? alu_flag_zero :
+							(insn_y == 2'd2) ? !alu_flag_carry :
+							(insn_y == 2'd3) ? alu_flag_carry : 0;
+
 	//
 	// data pipeline
 	//
@@ -186,6 +196,17 @@ module cpu(
 						alu_operand_b <= 8'h01;
 						alu_operator <= `ALU_OP_ADD;
 
+						// TODO: flags???
+
+						op <= `OP_ALU;
+						state <= `STATE_EXECUTE;
+						target_register <= insn_y;
+					end else if (insn_z == 3'd5) begin
+						// DEC r[y]
+
+						alu_operand_a <= insn_y_register_value;
+						alu_operand_b <= 8'h01;
+						alu_operator <= `ALU_OP_SUB;
 
 						// TODO: flags???
 
@@ -205,7 +226,17 @@ module cpu(
 						state <= `STATE_INSN_FETCH;
 					end
 				end else if (insn_x == 2'd3) begin
-					if (insn_z == 3'd3) begin
+					if (insn_z == 3'd2) begin
+						// JP cc[y], nn
+						if (insn_cc_true) begin
+							op <= `OP_JP;
+							state <= `STATE_DATA_L_FETCH;
+						end else begin
+							state <= `STATE_INSN_FETCH;
+							// TODO: would be good if this could reuse the JP adders
+							register_PC <= register_PC + 2;
+						end
+					end else if (insn_z == 3'd3) begin
 						if (insn_y == 3'd0) begin
 							// JP nn
 							op <= `OP_JP;
@@ -294,8 +325,8 @@ module cpu(
 					state <= `STATE_INSN_FETCH;
 				end else if (op == `OP_JP) begin
 					// jump to the address
-
 					register_PC <= {bus_data_in, lower_byte};
+					state <= `STATE_INSN_FETCH;
 				end
 			end else if (state == `STATE_WRITE) begin
 				// write back to memory

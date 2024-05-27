@@ -38,15 +38,15 @@ module soc(
 				if (bus_address_out == 16'd0) begin
 					bus_data_in <= 8'h3E; // LD A, d8
 				end else if (bus_address_out == 16'd1) begin
-					bus_data_in <= 8'h55;
+					bus_data_in <= 8'h3;
 				end else if (bus_address_out == 16'd2) begin
-					bus_data_in <= 8'h3C; // INC A
+					bus_data_in <= 8'h3D; // DEC A
 				end else if (bus_address_out == 16'd3) begin
-					bus_data_in <= 8'hC3; // JP a16
+					bus_data_in <= 8'hC2; // JP nz, a16
 				end else if (bus_address_out == 16'd4) begin
-					bus_data_in <= 8'hBB; // lower byte
+					bus_data_in <= 8'h02; // lower byte
 				end else if (bus_address_out == 16'd5) begin
-					bus_data_in <= 8'hAA; // upper byte
+					bus_data_in <= 8'h00; // upper byte
 				end else begin
 					bus_data_in <= 8'h00; // NOP
 				end
