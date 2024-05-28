@@ -30,4 +30,6 @@ module tt_um_thatoddmailbox (
 		.spi_miso(ui_in[7])
 	);
 
+	assign uo_out[7] = 1'b1;
+
 endmodule
