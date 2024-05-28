@@ -20,7 +20,7 @@ project:
     - "cpu.v"
     - "project.v"
     - "soc.v"
-    - "spi.v"
+    - "spi_core.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
