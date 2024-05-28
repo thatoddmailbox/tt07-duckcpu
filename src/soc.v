@@ -24,6 +24,18 @@ module soc(
 		.bus_wait(!bus_completed)
 	);
 
+	spi_core spi_inst(
+		.clk(clk),
+		.rst_n(rst_n),
+		.spi_clk(),
+		.spi_mosi(),
+		.spi_miso(),
+		.data_tx(8'hA5),
+		.data_rx(),
+		.have_data(1'b1),
+		.txn_done()
+	);
+
 	always @(posedge clk) begin
 		if (!rst_n) begin
 			// reset stuff
