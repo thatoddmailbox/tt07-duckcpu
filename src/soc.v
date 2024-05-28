@@ -6,7 +6,7 @@ module soc(
 
 	output wire spi_clk,
 	output wire spi_mosi,
-	input wire spi_miso,
+	input wire spi_miso
 );
 
 	wire [15:0] bus_address_out;

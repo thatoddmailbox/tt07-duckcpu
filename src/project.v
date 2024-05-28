@@ -25,8 +25,8 @@ module tt_um_thatoddmailbox (
 		.clk(clk),
 		.rst_n(rst_n),
 
-		.spi_clk(uo_out[6])
-		.spi_mosi(uo_out[5])
+		.spi_clk(uo_out[6]),
+		.spi_mosi(uo_out[5]),
 		.spi_miso(uo_out[4])
 	);
 
