@@ -16,6 +16,7 @@ module spi_core(
 
 	reg [7:0] tx_buf;
 	reg active;
+	reg [2:0] bit_count;
 
 	assign txn_done = !active;
 
@@ -23,6 +24,9 @@ module spi_core(
 		if (!rst_n) begin
 			tx_buf <= 8'h00;
 			active <= 1'b0;
+			bit_count <= 3'b0;
+
+			data_rx <= 8'h00;
 
 			spi_clk <= 1'b0;
 			spi_mosi <= 1'b0;
@@ -31,6 +35,7 @@ module spi_core(
 				if (have_data) begin
 					tx_buf <= data_tx;
 					active <= 1'b1;
+					bit_count <= 3'b0;
 				end
 			end else begin
 				spi_clk <= ~spi_clk;
@@ -39,6 +44,13 @@ module spi_core(
 					// TODO: cpha bit???
 					tx_buf <= {tx_buf[6:0], 1'b0};
 					spi_mosi <= tx_buf[7];
+					bit_count <= bit_count + 1;
+				end else begin
+					// we just made the clk go down, so we should read in the next bit
+					data_rx <= {data_rx[6:0], spi_miso};
+					if (bit_count == 3'b111) begin
+						active <= 1'b0;
+					end
 				end
 			end
 		end
