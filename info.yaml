@@ -18,6 +18,7 @@ project:
     - "alu.v"
     - "cpu_decoder.v"
     - "cpu.v"
+    - "mem_ctrl.v"
     - "project.v"
     - "soc.v"
     - "spi_core.v"
