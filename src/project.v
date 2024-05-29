@@ -27,9 +27,11 @@ module tt_um_thatoddmailbox (
 
 		.spi_clk(uo_out[6]),
 		.spi_mosi(uo_out[5]),
-		.spi_miso(ui_in[7])
+		.spi_miso(ui_in[7]) //,
+
+		// .quack(uo_out[7])
 	);
 
-	assign uo_out[7] = 1'b1;
+	assign uo_out[7] = uio_in[7];
 
 endmodule

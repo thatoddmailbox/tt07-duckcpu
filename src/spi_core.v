@@ -10,7 +10,7 @@ module spi_core(
 
 	input wire [7:0] data_tx,
 	output reg [7:0] data_rx,
-	input wire have_data,
+	input wire txn_start,
 	output wire txn_done
 );
 
@@ -32,7 +32,7 @@ module spi_core(
 			spi_mosi <= 1'b0;
 		end else begin
 			if (!active) begin
-				if (have_data) begin
+				if (txn_start) begin
 					tx_buf <= data_tx;
 					active <= 1'b1;
 					bit_count <= 3'b0;
