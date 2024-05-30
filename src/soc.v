@@ -6,7 +6,9 @@ module soc(
 
 	output wire spi_clk,
 	output wire spi_mosi,
-	input wire spi_miso
+	input wire spi_miso,
+	output wire spi_flash_ce_n,
+	output wire spi_ram_ce_n
 );
 
 	wire [15:0] bus_address_out;
@@ -38,10 +40,10 @@ module soc(
 		.spi_clk(spi_clk),
 		.spi_mosi(spi_mosi),
 		.spi_miso(spi_miso),
-		.data_tx(8'hA5),
-		.data_rx(),
-		.txn_start(1'b1),
-		.txn_done()
+		.data_tx(rspi_data_tx),
+		.data_rx(rspi_data_rx),
+		.txn_start(rspi_txn_start),
+		.txn_done(rspi_txn_done)
 	);
 
 	// memory map
@@ -70,7 +72,10 @@ module soc(
 		.spi_data_tx(rspi_data_tx),
 		.spi_data_rx(rspi_data_rx),
 		.spi_txn_start(rspi_txn_start),
-		.spi_txn_done(rspi_txn_done)
+		.spi_txn_done(rspi_txn_done),
+
+		.spi_flash_ce_n(spi_flash_ce_n),
+		.spi_ram_ce_n(spi_ram_ce_n)
 	);
 
 	assign bus_data_in = (bus_access_register ? register_bus_data_in : memory_bus_in);
