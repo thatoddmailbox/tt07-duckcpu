@@ -53,10 +53,10 @@ module soc(
 	wire memory_bus_wait;
 	wire [7:0] memory_bus_in;
 
-	wire register_bus_data_in = 8'h00;
+	wire [7:0] register_bus_data_in = 8'h00;
 	wire register_bus_wait = 1'b0;
 
-	mem_ctrl mem_inst(
+	mem_ctrl mem_ctrl_inst(
 		.clk(clk),
 		.rst_n(rst_n),
 
