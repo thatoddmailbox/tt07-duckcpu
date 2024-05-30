@@ -37,6 +37,11 @@ module soc(
 	spi_core spi_inst(
 		.clk(clk),
 		.rst_n(rst_n),
+`ifdef SIM
+		.divider(5'd0),
+`else
+		.divider(5'd25),
+`endif
 		.spi_clk(spi_clk),
 		.spi_mosi(spi_mosi),
 		.spi_miso(spi_miso),
