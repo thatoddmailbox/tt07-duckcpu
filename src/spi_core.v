@@ -48,7 +48,7 @@ module spi_core(
 				end else begin
 					// we just made the clk go down, so we should read in the next bit
 					data_rx <= {data_rx[6:0], spi_miso};
-					if (bit_count == 3'b111) begin
+					if (bit_count == 3'h0) begin
 						active <= 1'b0;
 					end
 				end
