@@ -11,7 +11,7 @@ module soc(
 
 	wire [15:0] bus_address_out;
 	wire [7:0] bus_data_out;
-	reg [7:0] bus_data_in;
+	wire [7:0] bus_data_in;
 	wire bus_read;
 	wire bus_write;
 	wire bus_wait;
