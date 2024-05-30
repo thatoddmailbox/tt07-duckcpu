@@ -42,6 +42,17 @@ module top_level(
 		.clk_out1(clk_50mhz)
 	);
 
+	reg [4:0] reset_counter = 0;
+	reg rst_n = 1'b0;
+
+	always @(posedge clk_50mhz) begin
+		if (reset_counter == 20) begin
+			rst_n <= 1'b1;
+		end else begin
+			reset_counter <= reset_counter + 1;
+		end
+	end
+
 	// TODO fix uio stuff
 	tt_um_thatoddmailbox tt_module(
 		.ui_in({ck_io7, ck_io6, ck_io5, ck_io4, ck_io3, ck_io2, ck_io1, ck_io0}),
@@ -51,7 +62,7 @@ module top_level(
 		.uio_oe(),
 		.ena(1'b1),
 		.clk(clk_50mhz),
-		.rst_n(1'b1)
+		.rst_n(rst_n)
 	);
 
 endmodule
