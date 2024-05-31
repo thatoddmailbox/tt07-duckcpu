@@ -33,6 +33,7 @@ module soc(
 	wire [7:0] rspi_data_rx;
 	wire rspi_txn_start;
 	wire rspi_txn_done;
+	wire rspi_force_clock;
 
 	spi_core spi_inst(
 		.clk(clk),
@@ -48,7 +49,8 @@ module soc(
 		.data_tx(rspi_data_tx),
 		.data_rx(rspi_data_rx),
 		.txn_start(rspi_txn_start),
-		.txn_done(rspi_txn_done)
+		.txn_done(rspi_txn_done),
+		.force_clock(rspi_force_clock)
 	);
 
 	// memory map
@@ -78,6 +80,7 @@ module soc(
 		.spi_data_rx(rspi_data_rx),
 		.spi_txn_start(rspi_txn_start),
 		.spi_txn_done(rspi_txn_done),
+		.spi_force_clock(rspi_force_clock),
 
 		.spi_flash_ce_n(spi_flash_ce_n),
 		.spi_ram_ce_n(spi_ram_ce_n)
