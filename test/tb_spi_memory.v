@@ -22,18 +22,22 @@ module tb_spi_memory(
 
 	reg [3:0] bit_counter = 0;
 
-	reg [7:0] data_array [0:7];
+	reg [7:0] data_array [0:11];
 	reg [7:0] data = 8'h00;
 
 	initial begin
-		data_array[0] = 8'h01;
-		data_array[1] = 8'h02;
-		data_array[2] = 8'h03;
-		data_array[3] = 8'h04;
-		data_array[4] = 8'h05;
-		data_array[5] = 8'h06;
-		data_array[6] = 8'h07;
-		data_array[7] = 8'h08;
+		data_array[0] = 8'h3E; // LD A, d8
+		data_array[1] = 8'h03;
+		data_array[2] = 8'h26; // LD H, d8
+		data_array[3] = 8'hFF;
+		data_array[4] = 8'h2E; // LD L, d8
+		data_array[5] = 8'h00;
+		data_array[6] = 8'h3D; // DEC A
+		data_array[7] = 8'h00; //77; // LD [HL], A
+		data_array[8] = 8'hC2; // JP nz, a16
+		data_array[9] = 8'h06; // lower byte
+		data_array[10] = 8'h00; // upper byte
+		data_array[11] = 8'h00; // NOP
 	end
 
 	always @(posedge spi_clk) begin
