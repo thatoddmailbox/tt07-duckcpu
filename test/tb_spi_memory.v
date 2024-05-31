@@ -70,7 +70,7 @@ module tb_spi_memory(
 					if (bit_counter == 7) begin
 						bit_counter <= 0;
 						state <= `STATE_DATA;
-						data <= data_array[address[2:0]];
+						data <= data_array[address];
 					end
 				end
 				`STATE_DATA: begin
@@ -84,7 +84,7 @@ module tb_spi_memory(
 							bit_counter <= 0;
 							// move to the next byte
 							address = address + 1;
-							data <= data_array[address[2:0]];
+							data <= data_array[address];
 						end
 					end else begin
 						// write data
