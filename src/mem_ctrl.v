@@ -27,7 +27,6 @@ module mem_ctrl(
 );
 
 	reg [2:0] counter;
-	reg waiting_for_spi_start;
 
 	reg [2:0] state;
 
@@ -51,7 +50,6 @@ module mem_ctrl(
 			bus_wait <= 1'b1;
 
 			counter <= 3'h0;
-			waiting_for_spi_start <= 1'b0;
 
 			state <= `STATE_IDLE;
 
