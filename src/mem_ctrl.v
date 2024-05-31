@@ -41,8 +41,8 @@ module mem_ctrl(
 	wire ram_access = bus_address[15];
 	wire bus_access = (bus_read || bus_write);
 
-	assign spi_flash_ce_n = !(bus_access && !ram_access);
-	assign spi_ram_ce_n = !(bus_access && ram_access);
+	assign spi_flash_ce_n = !(bus_access && !ram_access && state != `STATE_DUMMY_CLK);
+	assign spi_ram_ce_n = !(bus_access && ram_access && state != `STATE_DUMMY_CLK);
 
 	always @(posedge clk) begin
 		if (!rst_n) begin
