@@ -1,5 +1,6 @@
 `default_nettype none
 
+`define COMMAND_SIO_WRITE 8'h02
 `define COMMAND_SIO_READ 8'h03
 
 `define STATE_COMMAND 3'h0
@@ -12,7 +13,11 @@ module tb_spi_memory(
 	input wire spi_clk,
 	input wire spi_mosi,
 	output reg spi_miso,
-	input wire spi_ce
+	input wire spi_ce,
+
+	// If we are told to be flash, then we will not allow writes (like a real flash chip)
+	// TODO: would be cool if we simulated erasing and page programming to make it more like real flash
+	input wire is_flash
 );
 
 	reg [7:0] command = 0;
@@ -29,11 +34,11 @@ module tb_spi_memory(
 		data_array[0] = 8'h3E; // LD A, d8
 		data_array[1] = 8'h03;
 		data_array[2] = 8'h26; // LD H, d8
-		data_array[3] = 8'hFF;
+		data_array[3] = 8'hFE;
 		data_array[4] = 8'h2E; // LD L, d8
 		data_array[5] = 8'h00;
 		data_array[6] = 8'h3D; // DEC A
-		data_array[7] = 8'h00; //77; // LD [HL], A
+		data_array[7] = 8'h77; // LD [HL], A
 		data_array[8] = 8'hC2; // JP nz, a16
 		data_array[9] = 8'h06; // lower byte
 		data_array[10] = 8'h00; // upper byte
@@ -74,7 +79,10 @@ module tb_spi_memory(
 					if (bit_counter == 7) begin
 						bit_counter <= 0;
 						state <= `STATE_DATA;
-						data <= data_array[address];
+
+						if (command == `COMMAND_SIO_READ) begin
+							data <= data_array[address];
+						end
 					end
 				end
 				`STATE_DATA: begin
@@ -90,13 +98,24 @@ module tb_spi_memory(
 							address = address + 1;
 							data <= data_array[address];
 						end
-					end else begin
-						// write data
+					end else if (!is_flash && command == `COMMAND_SIO_WRITE) begin
+						data = {data[6:0], spi_mosi};
+						bit_counter <= bit_counter + 1;
+
+						if (bit_counter == 7) begin
+							bit_counter <= 0;
+
+							// move to the next byte
+							data_array[address] <= data;
+							$display("Wrote 0x%h to 0x%h", data, address);
+							address = address + 1;
+						end
 					end
 				end
 			endcase
 		end else begin
 			state <= `STATE_COMMAND;
+			spi_miso <= 1'b0;
 		end
 	end
 

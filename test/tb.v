@@ -41,11 +41,30 @@ module tb ();
       .rst_n  (rst_n)     // not reset
   );
 
+  wire flash_ce = uo_out[7];
+  wire ram_ce = uo_out[4];
+
+  wire flash_miso;
+  wire ram_miso;
+
+  assign ui_in[7] = (!flash_ce ? flash_miso : ram_miso);
+
   tb_spi_memory virtual_flash(
     .spi_clk(uo_out[6]),
     .spi_mosi(uo_out[5]),
-    .spi_miso(ui_in[7]),
-    .spi_ce(uo_out[7])
+    .spi_miso(flash_miso),
+    .spi_ce(flash_ce),
+
+    .is_flash(1'b1)
+  );
+
+  tb_spi_memory virtual_ram(
+    .spi_clk(uo_out[6]),
+    .spi_mosi(uo_out[5]),
+    .spi_miso(ram_miso),
+    .spi_ce(ram_ce),
+
+    .is_flash(1'b0)
   );
 
   // wire [15:0] bus_address_out;
