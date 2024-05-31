@@ -1,5 +1,8 @@
 `default_nettype none
 
+`define COMMAND_SIO_WRITE 8'h02
+`define COMMAND_SIO_READ 8'h03
+
 `define STATE_IDLE 3'h0
 `define STATE_SPI_START 3'h1
 `define STATE_SPI_WAIT 3'h2
@@ -31,12 +34,16 @@ module mem_ctrl(
 
 	reg [2:0] state;
 
+	// IMPORTANT: WE MASK OFF THE TOPMOST BIT OF THE ADDRESS!!!
+	// this is because our memory space is split in half (flash and ram)
+	// but the address we pass to the memory chip needs to be masked so that it appears correctly
+	// in other words: an access to address 0x8123 gets translated to 0x0123 for the RAM chip
 	assign spi_data_tx = (
-		(counter == 0) ? 8'h03 :
+		(counter == 0) ? (bus_write ? `COMMAND_SIO_WRITE : `COMMAND_SIO_READ) :
 		(counter == 1) ? 8'h00 :
-		(counter == 2) ? bus_address[15:8] :
+		(counter == 2) ? {1'b0, bus_address[14:8]} :
 		(counter == 3) ? bus_address[7:0] :
-		8'h00
+		(bus_write ? bus_data_tx : 8'h00)
 	);
 
 	wire ram_access = bus_address[15];
