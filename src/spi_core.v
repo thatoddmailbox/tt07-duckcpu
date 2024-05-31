@@ -50,6 +50,7 @@ module spi_core(
 				end else if (force_clock) begin
 					active <= 1'b1;
 					forcing_clock <= 1'b1;
+					spi_clk <= 1'b1;
 				end
 			end else begin
 				counter <= counter + 1;
@@ -59,10 +60,11 @@ module spi_core(
 					counter <= 0;
 
 					if (forcing_clock) begin
-						if (spi_clk) begin
+						if (spi_clk == 1'b0) begin
 							// we did it, go back to normal
 							active <= 1'b0;
 							forcing_clock <= 1'b0;
+							spi_clk <= 1'b0;
 						end
 					end else begin
 						if (spi_clk == 1'b0) begin
