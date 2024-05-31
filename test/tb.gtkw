@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Thu May 30 16:21:05 2024
+[*] Fri May 31 02:16:58 2024
 [*]
 [dumpfile] "/home/alex/Documents/GitHub/tt07-duckcpu/test/tb.vcd"
-[dumpfile_mtime] "Thu May 30 16:17:37 2024"
-[dumpfile_size] 13360
+[dumpfile_mtime] "Fri May 31 02:16:42 2024"
+[dumpfile_size] 19898
 [savefile] "/home/alex/Documents/GitHub/tt07-duckcpu/test/tb.gtkw"
 [timestart] 0
 [size] 2560 1372
 [pos] 2904 1129
-*-27.534533 960000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-28.534533 970000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] tb.
 [treeopen] tb.user_project.
 [treeopen] tb.user_project.soc_inst.
@@ -17,7 +17,7 @@
 [sst_width] 297
 [signals_width] 230
 [sst_expanded] 1
-[sst_vpaned_height] 450
+[sst_vpaned_height] 865
 @28
 tb.user_project.ena
 tb.user_project.clk
@@ -104,7 +104,21 @@ tb.user_project.soc_inst.mem_ctrl_inst.spi_data_tx[7:0]
 tb.user_project.soc_inst.mem_ctrl_inst.bus_wait
 @24
 tb.user_project.soc_inst.mem_ctrl_inst.counter[2:0]
-@29
+@28
 tb.user_project.soc_inst.mem_ctrl_inst.waiting_for_spi_start
+@24
+tb.user_project.soc_inst.mem_ctrl_inst.state[2:0]
+@200
+-Virtual SPI memory
+@22
+tb.virtual_flash.command[7:0]
+tb.virtual_flash.address[23:0]
+@28
+tb.virtual_flash.state[2:0]
+tb.virtual_flash.spi_ce
+@23
+tb.virtual_flash.data[7:0]
+@22
+tb.virtual_flash.data_out[7:0]
 [pattern_trace] 1
 [pattern_trace] 0
