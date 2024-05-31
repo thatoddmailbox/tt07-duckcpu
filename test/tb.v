@@ -41,6 +41,13 @@ module tb ();
       .rst_n  (rst_n)     // not reset
   );
 
+  tb_spi_memory virtual_flash(
+    .spi_clk(uo_out[6]),
+    .spi_mosi(uo_out[5]),
+    .spi_miso(ui_in[7]),
+    .spi_ce(uo_out[7])
+  );
+
   // wire [15:0] bus_address_out;
 	// wire [7:0] bus_data_out;
 	// reg [7:0] bus_data_in;
