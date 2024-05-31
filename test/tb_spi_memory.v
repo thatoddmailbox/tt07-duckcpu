@@ -98,17 +98,21 @@ module tb_spi_memory(
 							address = address + 1;
 							data <= data_array[address];
 						end
-					end else if (!is_flash && command == `COMMAND_SIO_WRITE) begin
-						data = {data[6:0], spi_mosi};
-						bit_counter <= bit_counter + 1;
+					end else if (command == `COMMAND_SIO_WRITE) begin
+						if (!is_flash) begin
+							data = {data[6:0], spi_mosi};
+							bit_counter <= bit_counter + 1;
 
-						if (bit_counter == 7) begin
-							bit_counter <= 0;
+							if (bit_counter == 7) begin
+								bit_counter <= 0;
 
-							// move to the next byte
-							data_array[address] <= data;
-							$display("Wrote 0x%h to 0x%h", data, address);
-							address = address + 1;
+								// move to the next byte
+								data_array[address] <= data;
+								$display("Wrote 0x%h to 0x%h", data, address);
+								address = address + 1;
+							end
+						end else begin
+							$error("Tried to write to flash!");
 						end
 					end
 				end
