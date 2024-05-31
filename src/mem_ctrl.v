@@ -4,7 +4,8 @@
 `define STATE_SPI_START 3'h1
 `define STATE_SPI_WAIT 3'h2
 `define STATE_SPI_DONE 3'h3
-`define STATE_DUMMY_CLK 3'h4
+`define STATE_DUMMY_CLK_START 3'h4
+`define STATE_DUMMY_CLK_WAIT 3'h5
 
 module mem_ctrl(
 	input wire clk,
@@ -40,9 +41,10 @@ module mem_ctrl(
 
 	wire ram_access = bus_address[15];
 	wire bus_access = (bus_read || bus_write);
+	wire dummy_clk_active = (state == `STATE_DUMMY_CLK_START || state == `STATE_DUMMY_CLK_WAIT);
 
-	assign spi_flash_ce_n = !(bus_access && !ram_access && state != `STATE_DUMMY_CLK);
-	assign spi_ram_ce_n = !(bus_access && ram_access && state != `STATE_DUMMY_CLK);
+	assign spi_flash_ce_n = !(bus_access && !ram_access && !dummy_clk_active);
+	assign spi_ram_ce_n = !(bus_access && ram_access && !dummy_clk_active);
 
 	always @(posedge clk) begin
 		if (!rst_n) begin
@@ -78,7 +80,7 @@ module mem_ctrl(
 						// we finished the transmission, we have the data
 						bus_wait <= 1'b0;
 						bus_data_rx <= spi_data_rx;
-						state <= `STATE_DUMMY_CLK;
+						state <= `STATE_DUMMY_CLK_START;
 						spi_force_clock <= 1'b1;
 						counter <= 3'h0;
 					end else begin
@@ -86,7 +88,15 @@ module mem_ctrl(
 						spi_txn_start <= 1'b1;
 					end
 				end
-			end else if (state == `STATE_DUMMY_CLK) begin
+			end else if (state == `STATE_DUMMY_CLK_START) begin
+				bus_wait <= 1'b1;
+
+				// TODO: should only insert this if we actually want to change addr
+				if (!spi_txn_done) begin
+					state <= `STATE_DUMMY_CLK_WAIT;
+					spi_force_clock <= 1'b0;
+				end
+			end else if (state == `STATE_DUMMY_CLK_WAIT) begin
 				// TODO: should only insert this if we actually want to change addr
 				if (spi_txn_done) begin
 					spi_force_clock <= 1'b0;
