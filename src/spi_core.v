@@ -30,7 +30,7 @@ module spi_core(
 			active <= 1'b0;
 			bit_count <= 3'b0;
 
-			counter <= 7'h00;
+			counter <= 0;
 
 			data_rx <= 8'h00;
 
@@ -48,6 +48,7 @@ module spi_core(
 
 				if (counter == divider) begin
 					spi_clk <= ~spi_clk;
+					counter <= 0;
 					if (spi_clk == 1'b0) begin
 						// we just made the clk go up, so we should shift out the next bit
 						// TODO: cpha bit???
