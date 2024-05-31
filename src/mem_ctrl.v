@@ -93,55 +93,6 @@ module mem_ctrl(
 					state <= `STATE_IDLE;
 				end
 			end
-
-			// if (bus_read) begin
-			// 	if (waiting_for_spi_start) begin
-			// 		if (!spi_txn_done) begin
-			// 			waiting_for_spi_start <= 1'b0;
-			// 			spi_txn_start <= 1'b0;
-			// 		end
-			// 	end else if (spi_txn_done) begin
-			// 		counter <= counter + 1;
-			// 		spi_txn_start <= 1'b1;
-			// 		waiting_for_spi_start <= 1'b1;
-
-			// 		if (counter == 4) begin
-			// 			bus_wait <= 1'b0;
-			// 			bus_data_rx <= spi_data_rx;
-			// 		end
-			// 	end
-
-			// 	// TODO: something more fun
-			// 	// if (bus_address == 16'd0) begin
-			// 	// 	bus_data_rx <= 8'h3E; // LD A, d8
-			// 	// end else if (bus_address == 16'd1) begin
-			// 	// 	bus_data_rx <= 8'h3;
-			// 	// end else if (bus_address == 16'd2) begin
-			// 	// 	bus_data_rx <= 8'h26; // LD H, d8
-			// 	// end else if (bus_address == 16'd3) begin
-			// 	// 	bus_data_rx <= 8'hFF;
-			// 	// end else if (bus_address == 16'd4) begin
-			// 	// 	bus_data_rx <= 8'h2E; // LD L, d8
-			// 	// end else if (bus_address == 16'd5) begin
-			// 	// 	bus_data_rx <= 8'h00;
-			// 	// end else if (bus_address == 16'd6) begin
-			// 	// 	bus_data_rx <= 8'h3D; // DEC A
-			// 	// end else if (bus_address == 16'd7) begin
-			// 	// 	bus_data_rx <= 8'h77; // LD [HL], A
-			// 	// end else if (bus_address == 16'd8) begin
-			// 	// 	bus_data_rx <= 8'hC2; // JP nz, a16
-			// 	// end else if (bus_address == 16'd9) begin
-			// 	// 	bus_data_rx <= 8'h06; // lower byte
-			// 	// end else if (bus_address == 16'd10) begin
-			// 	// 	bus_data_rx <= 8'h00; // upper byte
-			// 	// end else begin
-			// 	// 	bus_data_rx <= 8'h00; // NOP
-			// 	// end
-			// end else begin
-			// 	bus_wait <= 1'b1;
-			// 	counter <= 3'h0;
-			// 	waiting_for_spi_start <= 1'b0;
-			// end
 		end
 	end
 
