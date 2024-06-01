@@ -22,7 +22,7 @@ module spi_wrapper(
 	output reg spi_txn_start,
 	input wire spi_txn_done,
 	output reg spi_force_clock,
-	output reg spi_ce_n,
+	output reg spi_ce_n
 );
 
 	assign bus_wait = 1'b0;
@@ -49,7 +49,7 @@ module spi_wrapper(
 			spi_divider <= 25;
 
 			spi_data_tx <= 8'h00;
-			spi_txn_done <= 1'b0;
+			spi_txn_start <= 1'b0;
 			spi_force_clock <= 1'b0;
 			spi_ce_n <= 1'b1;
 		end else begin

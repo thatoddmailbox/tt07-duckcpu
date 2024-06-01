@@ -31,28 +31,31 @@ module tb_spi_memory(
 	reg [7:0] data = 8'h00;
 
 	initial begin
-		data_array[0] = 8'h26; // LD H, d8
-		data_array[1] = 8'hFF;
-		data_array[2] = 8'h2E; // LD L, d8
-		data_array[3] = 8'h02;
-		data_array[4] = 8'h3E; // LD A, d8
-		data_array[5] = 8'h01;
-		data_array[6] = 8'h77; // LD [HL], A
-		data_array[7] = 8'h2E; // LD L, d8
-		data_array[8] = 8'h03;
-		data_array[9] = 8'h3E; // LD A, d8
-		data_array[10] = 8'h00;
-		data_array[11] = 8'h77; // LD [HL], A
-		data_array[12] = 8'h2E; // LD L, d8
-		data_array[13] = 8'h01;
-		data_array[14] = 8'h3E; // LD A, d8
-		data_array[15] = 8'h03;
-		data_array[16] = 8'h3D; // DEC A
-		data_array[17] = 8'h77; // LD [HL], A
-		data_array[18] = 8'hC2; // JP nz, a16
-		data_array[19] = 8'd16; // lower byte
-		data_array[20] = 8'h00; // upper byte
-		data_array[21] = 8'h00; // NOP
+		// data_array[0] = 8'h26; // LD H, d8
+		// data_array[1] = 8'hFF;
+		// data_array[2] = 8'h2E; // LD L, d8
+		// data_array[3] = 8'h02;
+		// data_array[4] = 8'h3E; // LD A, d8
+		// data_array[5] = 8'h01;
+		// data_array[6] = 8'h77; // LD [HL], A
+		// data_array[7] = 8'h2E; // LD L, d8
+		// data_array[8] = 8'h03;
+		// data_array[9] = 8'h3E; // LD A, d8
+		// data_array[10] = 8'h00;
+		// data_array[11] = 8'h77; // LD [HL], A
+		// data_array[12] = 8'h2E; // LD L, d8
+		// data_array[13] = 8'h01;
+		// data_array[14] = 8'h3E; // LD A, d8
+		// data_array[15] = 8'h03;
+		// data_array[16] = 8'h3D; // DEC A
+		// data_array[17] = 8'h77; // LD [HL], A
+		// data_array[18] = 8'hC2; // JP nz, a16
+		// data_array[19] = 8'd16; // lower byte
+		// data_array[20] = 8'h00; // upper byte
+		// data_array[21] = 8'h00; // NOP
+
+		// read from demo file
+		$readmemh("demo/out.mem", data_array);
 	end
 
 	always @(posedge spi_clk) begin

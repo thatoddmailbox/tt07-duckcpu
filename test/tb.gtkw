@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sat Jun  1 14:16:46 2024
+[*] Sat Jun  1 19:08:03 2024
 [*]
 [dumpfile] "/home/alex/Documents/GitHub/tt07-duckcpu/test/tb.vcd"
-[dumpfile_mtime] "Sat Jun  1 14:16:23 2024"
-[dumpfile_size] 987981
+[dumpfile_mtime] "Sat Jun  1 19:07:47 2024"
+[dumpfile_size] 975573
 [savefile] "/home/alex/Documents/GitHub/tt07-duckcpu/test/tb.gtkw"
 [timestart] 0
 [size] 2560 1372
 [pos] 2341 525
-*-25.534533 150000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-30.534533 5357000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] tb.
 [treeopen] tb.user_project.
 [treeopen] tb.user_project.soc_inst.
@@ -55,6 +55,8 @@ tb.user_project.soc_inst.cpu_inst.register_B[7:0]
 tb.user_project.soc_inst.cpu_inst.register_H[7:0]
 tb.user_project.soc_inst.cpu_inst.register_L[7:0]
 tb.user_project.soc_inst.cpu_inst.register_PC[15:0]
+@23
+tb.user_project.soc_inst.cpu_inst.register_SP[15:0]
 @200
 -CPU internal state
 @28
@@ -92,15 +94,6 @@ tb.user_project.soc_inst.cpu_inst.alu_inst.operator[2:0]
 tb.user_project.soc_inst.cpu_inst.alu_inst.result[7:0]
 @200
 -SPI bus
-@28
-tb.user_project.soc_inst.spi_inst.spi_clk
-tb.user_project.soc_inst.spi_inst.spi_miso
-tb.user_project.soc_inst.spi_inst.spi_mosi
-tb.user_project.soc_inst.spi_inst.txn_start
-tb.user_project.soc_inst.spi_inst.txn_done
-tb.user_project.soc_inst.spi_inst.force_clock
-tb.user_project.soc_inst.spi_inst.active
-@200
 -UART 0
 @28
 tb.user_project.soc_inst.uart0_inst.txd_out
