@@ -63,7 +63,7 @@ module uart_core(
 			rx_active <= 1'b0;
 			rx_bit_count <= 4'h0;
 
-			rx_state <= `STATE_START;
+			rx_state <= `STATE_DATA;
 		end else begin
 			//
 			// transmitter
@@ -122,9 +122,7 @@ module uart_core(
 
 					case (rx_state)
 						`STATE_START: begin
-							if (rxd_in == 1'b0) begin
-								rx_state <= `STATE_DATA;
-							end
+							// should not happen
 						end
 						`STATE_DATA: begin
 							rx_buf <= {rxd_in, rx_buf[7:1]};
@@ -155,7 +153,7 @@ module uart_core(
 				rx_active <= 1'b1;
 				rx_bit_count <= 4'h0;
 
-				rx_state <= `STATE_START;
+				rx_state <= `STATE_DATA;
 			end
 
 			if (data_rx_ack) begin
