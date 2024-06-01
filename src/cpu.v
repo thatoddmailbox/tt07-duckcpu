@@ -42,6 +42,7 @@ module cpu(
 	reg [7:0] register_L;
 
 	reg [15:0] register_PC;
+	reg [15:0] register_SP;
 
 	//
 	// instruction decoding
@@ -137,6 +138,7 @@ module cpu(
 	alu alu_inst(
 		.operand_a(alu_operand_a),
 		.operand_b(alu_operand_b),
+		.carry_in(1'b0),
 
 		.operator(alu_operator),
 
@@ -151,9 +153,7 @@ module cpu(
 	//
 
 	always @(posedge clk) begin
-		$display("\nclk start");
 		if (!rst_n) begin
-			$display("reset");
 			state <= `STATE_INSN_FETCH;
 			register_A <= 8'h00;
 			register_B <= 8'h00;
@@ -163,6 +163,7 @@ module cpu(
 			register_H <= 8'h00;
 			register_L <= 8'h00;
 			register_PC <= 16'h0000;
+			register_SP <= 16'h0000;
 
 			current_insn <= 8'h00;
 
@@ -182,36 +183,27 @@ module cpu(
 			alu_operator <= `ALU_OP_NOP;
 		end else if (active) begin
 			if (state == `STATE_INSN_FETCH) begin
-				$display("insn fetch");
-				$display("want_bus_read: %b", want_bus_read);
-
 				if (!want_bus_read) begin
-					$display("fetching next instruction");
-					$display("PC: %h", register_PC);
 					// fetch the next instruction
 					bus_address_out <= register_PC;
 					want_bus_read <= 1;
 					register_PC <= register_PC + 1;
 				end else if (bus_wait) begin
 					// wait for the bus to be ready
-					$display("waiting for bus");
 				end else begin
 					// we have the instruction
-					$display("have insn");
 					current_insn <= bus_data_in;
 					want_bus_read <= 0;
 					state <= `STATE_DECODE;
-
-					$display("got instruction: %b", bus_data_in);
 				end
 			end else if (state == `STATE_DECODE) begin
 				// instruction gets decoded by cpu_decoder module
 				// based on http://www.z80.info/decoding.htm
 
+`ifdef SIM
 				$display("decoding instruction: %b", current_insn);
 				$display("decoded instruction: %b %b %b", insn_x, insn_y, insn_z);
 
-`ifdef SIM
 				$display("instruction name: %s", current_insn_name);
 `endif
 
@@ -227,8 +219,6 @@ module cpu(
 						alu_operand_b <= 8'h01;
 						alu_operator <= `ALU_OP_ADD;
 
-						// TODO: flags???
-
 						op <= `OP_ALU;
 						state <= `STATE_EXECUTE;
 						target_register <= insn_y;
@@ -238,8 +228,6 @@ module cpu(
 						alu_operand_a <= insn_y_register_value;
 						alu_operand_b <= 8'h01;
 						alu_operator <= `ALU_OP_SUB;
-
-						// TODO: flags???
 
 						op <= `OP_ALU;
 						state <= `STATE_EXECUTE;
@@ -263,7 +251,11 @@ module cpu(
 					state <= `STATE_EXECUTE;
 					target_register <= insn_y;
 				end else if (insn_x == 2'd3) begin
-					if (insn_z == 3'd2) begin
+					if (insn_z == 3'd1) begin
+						// LD SP, HL
+						register_SP <= {register_H, register_L};
+						state <= `STATE_INSN_FETCH;
+					end else if (insn_z == 3'd2) begin
 						// JP cc[y], nn
 						if (insn_cc_true) begin
 							op <= `OP_JP;
@@ -288,7 +280,6 @@ module cpu(
 					state <= `STATE_INSN_FETCH;
 				end
 			end else if (state == `STATE_DATA_L_FETCH) begin
-				$display("STATE_DATA_L_FETCH");
 				if (!want_bus_read) begin
 					// fetch the next byte
 					bus_address_out <= register_PC;
@@ -310,7 +301,6 @@ module cpu(
 					end
 				end
 			end else if (state == `STATE_DATA_H_FETCH) begin
-				$display("STATE_DATA_H_FETCH");
 				if (!want_bus_read) begin
 					// fetch the next byte
 					bus_address_out <= register_PC;
@@ -385,7 +375,6 @@ module cpu(
 					state <= `STATE_INSN_FETCH;
 				end
 			end else if (state == `STATE_WRITE) begin
-				$display("writing");
 				// write back to memory
 				if (bus_wait) begin
 					// wait for the bus to be ready
