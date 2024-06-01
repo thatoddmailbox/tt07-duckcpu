@@ -11,8 +11,8 @@ module top_level(
 	input wire ck_io2,
 	input wire ck_io3,
 	input wire ck_io4,
-	input wire ck_io5,
-	input wire ck_io6,
+	output wire ck_io5,
+	output wire ck_io6,
 	input wire ck_io7,
 
 	output wire ck_io26,
@@ -38,6 +38,9 @@ module top_level(
 
 	assign uart_rxd_out = uart0_txd_out; //uo_out[3];
 	assign ck_io29 = uart0_txd_out;
+
+	assign ck_io6 = uart_txd_in;
+	assign ck_io5 = tt_module.soc_inst.uart0_inst.rx_counter < 10;
 
 	wire clk_50mhz;
 	clk_wiz_0 clk_inst(

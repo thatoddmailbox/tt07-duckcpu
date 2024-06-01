@@ -42,31 +42,31 @@ module tb ();
   );
 
   // uart loopback
-  // assign ui_in[6] = uo_out[3];
+  // assign ui_in[7] = uo_out[3];
   reg lol = 1'b1;
   always @(posedge clk) begin
     lol <= ~lol;
   end
-  assign ui_in[6] = lol;
+  assign ui_in[7] = lol;
 
-  wire flash_ce = uo_out[7];
-  wire ram_ce = uo_out[4];
+  wire flash_ce = uo_out[2];
+  wire ram_ce = uo_out[3];
 
   wire flash_miso;
   wire ram_miso;
 
-  assign ui_in[7] = (!flash_ce ? flash_miso : ram_miso);
+  assign ui_in[6] = (!flash_ce ? flash_miso : ram_miso);
+  assign ui_in[4] = 1'b1; // bootsel
 
   assign ui_in[5] = 1'b0;
-  assign ui_in[4] = 1'b0;
   assign ui_in[3] = 1'b0;
   assign ui_in[2] = 1'b0;
   assign ui_in[1] = 1'b0;
   assign ui_in[0] = 1'b0;
 
   tb_spi_memory virtual_flash(
-    .spi_clk(uo_out[6]),
-    .spi_mosi(uo_out[5]),
+    .spi_clk(uo_out[0]),
+    .spi_mosi(uo_out[1]),
     .spi_miso(flash_miso),
     .spi_ce(flash_ce),
 
@@ -74,8 +74,8 @@ module tb ();
   );
 
   tb_spi_memory virtual_ram(
-    .spi_clk(uo_out[6]),
-    .spi_mosi(uo_out[5]),
+    .spi_clk(uo_out[0]),
+    .spi_mosi(uo_out[1]),
     .spi_miso(ram_miso),
     .spi_ce(ram_ce),
 

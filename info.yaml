@@ -19,6 +19,7 @@ project:
     - "bootloader.v"
     - "cpu_decoder.v"
     - "cpu.v"
+    - "gpio_wrapper.v"
     - "mem_ctrl.v"
     - "project.v"
     - "soc.v"
@@ -50,14 +51,14 @@ pinout:
   uo[7]: "spi0_ce_n"
 
   # Bidirectional pins
-  uio[0]: ""
-  uio[1]: ""
-  uio[2]: ""
-  uio[3]: ""
-  uio[4]: ""
-  uio[5]: ""
-  uio[6]: ""
-  uio[7]: ""
+  uio[0]: "gpio0_data[0]"
+  uio[1]: "gpio0_data[1]"
+  uio[2]: "gpio0_data[2]"
+  uio[3]: "gpio0_data[3]"
+  uio[4]: "gpio0_data[4]"
+  uio[5]: "gpio0_data[5]"
+  uio[6]: "gpio0_data[6]"
+  uio[7]: "gpio0_data[7]"
 
 # Do not change!
 yaml_version: 6

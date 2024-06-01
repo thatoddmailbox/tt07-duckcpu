@@ -17,9 +17,9 @@ module alu(
 
 	wire [8:0] internal_result = (operator == `ALU_OP_ADD) ? operand_a + operand_b + carry_in :
 									(operator == `ALU_OP_SUB) ? operand_a - operand_b - carry_in :
-									(operator == `ALU_OP_AND) ? operand_a & operand_b :
-									(operator == `ALU_OP_OR) ? operand_a | operand_b :
-									(operator == `ALU_OP_XOR) ? operand_a ^ operand_b :
+									(operator == `ALU_OP_AND) ? {1'b0, operand_a & operand_b} :
+									(operator == `ALU_OP_OR) ? {1'b0, operand_a | operand_b} :
+									(operator == `ALU_OP_XOR) ? {1'b0, operand_a ^ operand_b} :
 									8'h71;
 
 	assign result = internal_result[7:0];

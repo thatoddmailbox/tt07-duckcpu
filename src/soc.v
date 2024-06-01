@@ -18,7 +18,11 @@ module soc(
 	output wire spi0_clk,
 	output wire spi0_mosi,
 	input wire spi0_miso,
-	output wire spi0_ce_n
+	output wire spi0_ce_n,
+
+	input wire [7:0] gpio_in,
+	output reg [7:0] gpio_out,
+	output reg [7:0] gpio_direction
 );
 
 	reg bootloader_active;
@@ -67,6 +71,7 @@ module soc(
 	wire bus_access_register = (bus_address_out[15:8] == 8'hFF);
 	wire bus_access_uart0 = (bus_address_out[7:4] == 4'h0);
 	wire bus_access_spi0 = (bus_address_out[7:4] == 4'h1);
+	wire bus_access_gpio0 = (bus_address_out[7:4] == 4'h2);
 
 	wire memory_bus_wait;
 	wire [7:0] memory_bus_in;
@@ -77,14 +82,19 @@ module soc(
 	wire [7:0] spi0_bus_data_rx;
 	wire spi0_bus_wait;
 
+	wire [7:0] gpio0_bus_data_rx;
+	wire gpio0_bus_wait;
+
 	wire [7:0] register_bus_data_in = (
 		bus_access_uart0 ? uart0_bus_data_rx :
 		bus_access_spi0 ? spi0_bus_data_rx :
+		bus_access_gpio0 ? gpio0_bus_data_rx :
 		8'h00
 	);
 	wire register_bus_wait = (
 		bus_access_uart0 ? uart0_bus_wait :
 		bus_access_spi0 ? spi0_bus_wait :
+		bus_access_gpio0 ? gpio0_bus_wait :
 		1'b0
 	);
 
@@ -102,9 +112,9 @@ module soc(
 		.clk(clk),
 		.rst_n(rst_n),
 `ifdef SIM
-		.divider(5'd0),
+		.divider(8'd0),
 `else
-		.divider(5'd25),
+		.divider(8'd25),
 `endif
 		.spi_clk(rspi_clk),
 		.spi_mosi(rspi_mosi),
@@ -305,6 +315,26 @@ module soc(
 		.spi_txn_done(spi0_txn_done),
 		.spi_force_clock(spi0_force_clock),
 		.spi_ce_n(spi0_ce_n)
+	);
+
+	//
+	// gpio0
+	//
+
+	gpio_wrapper gpio0_wrapper(
+		.clk(clk),
+		.rst_n(rst_n),
+
+		.bus_address(bus_address_out[0]),
+		.bus_data_tx(bus_data_out),
+		.bus_data_rx(gpio0_bus_data_rx),
+		.bus_read(bus_access_gpio0 ? bus_read : 1'b0),
+		.bus_write(bus_access_gpio0 ? bus_write : 1'b0),
+		.bus_wait(gpio0_bus_wait),
+
+		.gpio_in(gpio_in),
+		.gpio_out(gpio_out),
+		.gpio_direction(gpio_direction)
 	);
 
 

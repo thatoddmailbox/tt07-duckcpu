@@ -36,7 +36,11 @@ module tt_um_thatoddmailbox (
 		.spi0_clk(uo_out[5]),
 		.spi0_mosi(uo_out[6]),
 		.spi0_miso(ui_in[5]),
-		.spi0_ce_n(uo_out[7])
+		.spi0_ce_n(uo_out[7]),
+
+		.gpio_in(uio_in),
+		.gpio_out(uio_out),
+		.gpio_direction(uio_oe)
 	);
 
 endmodule

@@ -4,7 +4,7 @@ module spi_core(
 	input wire clk,
 	input wire rst_n,
 
-	input wire [4:0] divider,
+	input wire [7:0] divider,
 
 	output reg spi_clk,
 	output reg spi_mosi,
@@ -17,7 +17,7 @@ module spi_core(
 	input wire force_clock
 );
 
-	reg [4:0] counter;
+	reg [7:0] counter;
 
 	reg [7:0] tx_buf;
 	reg active;
