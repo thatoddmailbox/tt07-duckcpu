@@ -64,7 +64,6 @@ module mem_ctrl(
 
 			spi_txn_start <= 1'b0;
 			spi_force_clock <= 1'b0;
-			// spi_data_tx <= 8'h00;
 		end else begin
 			if (state == `STATE_IDLE) begin
 				bus_wait <= 1'b1;
