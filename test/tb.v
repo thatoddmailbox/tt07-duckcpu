@@ -52,6 +52,13 @@ module tb ();
 
   assign ui_in[7] = (!flash_ce ? flash_miso : ram_miso);
 
+  assign ui_in[5] = 1'b0;
+  assign ui_in[4] = 1'b0;
+  assign ui_in[3] = 1'b0;
+  assign ui_in[2] = 1'b0;
+  assign ui_in[1] = 1'b0;
+  assign ui_in[0] = 1'b0;
+
   tb_spi_memory virtual_flash(
     .spi_clk(uo_out[6]),
     .spi_mosi(uo_out[5]),

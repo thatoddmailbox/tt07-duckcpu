@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Fri May 31 06:29:45 2024
+[*] Sat Jun  1 08:49:06 2024
 [*]
 [dumpfile] "/home/alex/Documents/GitHub/tt07-duckcpu/test/tb.vcd"
-[dumpfile_mtime] "Fri May 31 06:27:12 2024"
-[dumpfile_size] 167681
+[dumpfile_mtime] "Sat Jun  1 08:48:34 2024"
+[dumpfile_size] 772709
 [savefile] "/home/alex/Documents/GitHub/tt07-duckcpu/test/tb.gtkw"
-[timestart] 21012000000
+[timestart] 3200000000
 [size] 2560 1372
-[pos] 2904 1129
-*-28.534533 22740000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] 2383 534
+*-31.534533 18250000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] tb.
 [treeopen] tb.user_project.
 [treeopen] tb.user_project.soc_inst.
@@ -101,6 +101,21 @@ tb.user_project.soc_inst.spi_inst.txn_done
 tb.user_project.soc_inst.spi_inst.force_clock
 tb.user_project.soc_inst.spi_inst.active
 @200
+-UART 0
+@28
+tb.user_project.soc_inst.uart0_inst.txd_out
+tb.user_project.soc_inst.uart0_inst.rxd_in
+@22
+tb.user_project.soc_inst.uart0_inst.data_tx[7:0]
+@28
+tb.user_project.soc_inst.uart0_inst.have_data_tx
+@29
+tb.user_project.soc_inst.uart0_inst.transmitting
+@22
+tb.user_project.soc_inst.uart0_inst.data_rx[7:0]
+@28
+tb.user_project.soc_inst.uart0_inst.have_data_rx
+@200
 -Memory controller
 @22
 tb.user_project.soc_inst.mem_ctrl_inst.spi_data_tx[7:0]
@@ -126,7 +141,6 @@ tb.virtual_flash.data[7:0]
 @22
 tb.virtual_ram.command[7:0]
 tb.virtual_ram.address[23:0]
-@23
 tb.virtual_ram.state[2:0]
 @28
 tb.virtual_ram.spi_ce
