@@ -35,6 +35,9 @@ module cpu(
 
 	reg [7:0] register_A;
 	reg [7:0] register_B;
+	reg [7:0] register_C;
+	reg [7:0] register_D;
+	reg [7:0] register_E;
 	reg [7:0] register_H;
 	reg [7:0] register_L;
 
@@ -68,18 +71,18 @@ module cpu(
 	// TODO: many registers missing
 	// TODO: [HL] is not implemented
 	assign insn_y_register_value = (insn_y == 3'd0) ? register_B :
-	                                (insn_y == 3'd1) ? 8'hBB : //register_C :
-	                                (insn_y == 3'd2) ? 8'hBB : //register_D :
-	                                (insn_y == 3'd3) ? 8'hBB : //register_E :
+	                                (insn_y == 3'd1) ? register_C :
+	                                (insn_y == 3'd2) ? register_D :
+	                                (insn_y == 3'd3) ? register_E :
 	                                (insn_y == 3'd4) ? register_H :
 	                                (insn_y == 3'd5) ? register_L :
 	                                (insn_y == 3'd6) ? 8'hAA :
 	                                (insn_y == 3'd7) ? register_A :
 	                                8'h00;
 	assign insn_z_register_value = (insn_z == 3'd0) ? register_B :
-	                                (insn_z == 3'd1) ? 8'hBB : //register_C :
-	                                (insn_z == 3'd2) ? 8'hBB : //register_D :
-	                                (insn_z == 3'd3) ? 8'hBB : //register_E :
+	                                (insn_z == 3'd1) ? register_C :
+	                                (insn_z == 3'd2) ? register_D :
+	                                (insn_z == 3'd3) ? register_E :
 	                                (insn_z == 3'd4) ? register_H :
 	                                (insn_z == 3'd5) ? register_L :
 	                                (insn_z == 3'd6) ? 8'hAA :
@@ -157,6 +160,9 @@ module cpu(
 			state <= `STATE_INSN_FETCH;
 			register_A <= 8'h00;
 			register_B <= 8'h00;
+			register_C <= 8'h00;
+			register_D <= 8'h00;
+			register_E <= 8'h00;
 			register_H <= 8'h00;
 			register_L <= 8'h00;
 			register_PC <= 16'h0000;
@@ -332,9 +338,9 @@ module cpu(
 					// TODO: probably other stuff could happen here?
 					case (target_register)
 						3'd0: register_B <= ld_input;
-						// 3'd1: register_C <= ld_input;
-						// 3'd2: register_D <= ld_input;
-						// 3'd3: register_E <= ld_input;
+						3'd1: register_C <= ld_input;
+						3'd2: register_D <= ld_input;
+						3'd3: register_E <= ld_input;
 						3'd4: register_H <= ld_input;
 						3'd5: register_L <= ld_input;
 						3'd6: begin
@@ -357,9 +363,9 @@ module cpu(
 					// TODO: probably other stuff could happen here?
 					case (target_register)
 						3'd0: register_B <= alu_result;
-						// 3'd1: register_C <= alu_result;
-						// 3'd2: register_D <= alu_result;
-						// 3'd3: register_E <= alu_result;
+						3'd1: register_C <= alu_result;
+						3'd2: register_D <= alu_result;
+						3'd3: register_E <= alu_result;
 						3'd4: register_H <= alu_result;
 						3'd5: register_L <= alu_result;
 						3'd6: begin
