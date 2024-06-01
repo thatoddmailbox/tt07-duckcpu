@@ -15,10 +15,12 @@
 `define RESPONSE_TRANSMIT_READY_FOR_COUNT 8'h91
 `define RESPONSE_TRANSMIT_READY_FOR_DATA 8'h92
 
-`define STATE_COMMAND 2'h0
-`define STATE_TRANSMIT_WAIT_FOR_COUNT 2'h1
-`define STATE_TRANSMIT_WAIT_FOR_DATA 2'h2
-`define STATE_TRANSMIT_WAIT_FOR_SPI 2'h3
+`define STATE_COMMAND 3'h0
+`define STATE_TRANSMIT_WAIT_FOR_COUNT 3'h1
+`define STATE_TRANSMIT_WAIT_FOR_DATA 3'h2
+`define STATE_TRANSMIT_WAIT_FOR_SPI 3'h3
+`define STATE_TRANSMIT_OUTPUT_RESULT_OK 3'h4
+`define STATE_TRANSMIT_OUTPUT_RESULT_DATA 3'h5
 
 `define BUFFER_SIZE 5
 
@@ -51,7 +53,7 @@ module bootloader(
 	// TODO: lol xd
 	assign uart_divider = 434; // 115200 baud @ 50 MHz system clock
 
-	reg [1:0] state;
+	reg [2:0] state;
 	reg [7:0] transmit_index;
 	reg [7:0] transmit_count;
 
@@ -62,6 +64,7 @@ module bootloader(
 
 	reg just_handled_rx;
 	reg spi_started;
+	reg uart_tx_started;
 
 	wire spi_ce = (state == `STATE_TRANSMIT_WAIT_FOR_SPI);
 	wire spi_ce_n = ~spi_ce;
@@ -86,6 +89,7 @@ module bootloader(
 			transmit_count <= 8'h00;
 			just_handled_rx <= 1'b0;
 			spi_started <= 1'b0;
+			uart_tx_started <= 1'b0;
 
 			// TODO: make this into a loop lol
 			transmit_buffer[0] <= 8'h00;
@@ -163,20 +167,19 @@ module bootloader(
 			if (state == `STATE_TRANSMIT_WAIT_FOR_SPI) begin
 				if (spi_started) begin
 					if (spi_txn_done) begin
-						transmit_count <= transmit_count - 1;
-
 						transmit_buffer[transmit_index] <= spi_data_rx;
 
 						// uart_data_tx <= spi_data_rx;
 						// uart_have_data_tx <= 1'b1;
 
-						if (transmit_count == 8'h01) begin
+						if ((transmit_index + 1) == transmit_count) begin
 							// that was the last byte, we're done
 							// TODO: tell computer response data
-							state <= `STATE_COMMAND;
+							state <= `STATE_TRANSMIT_OUTPUT_RESULT_OK;
 
 							uart_data_tx <= `RESPONSE_OK;
 							uart_have_data_tx <= 1'b1;
+							uart_tx_started <= 1'b1;
 						end else begin
 							// still have more bytes to transmit
 							state <= `STATE_TRANSMIT_WAIT_FOR_SPI;
@@ -191,6 +194,44 @@ module bootloader(
 					if (!spi_txn_done) begin
 						spi_txn_start <= 1'b0;
 						spi_started <= 1'b1;
+					end
+				end
+			end else if (state == `STATE_TRANSMIT_OUTPUT_RESULT_OK) begin
+				if (uart_tx_started) begin
+					if (uart_transmitting) begin
+						uart_tx_started <= 1'b0;
+					end
+				end else begin
+					if (!uart_transmitting) begin
+						// still have more bytes to transmit
+						state <= `STATE_TRANSMIT_OUTPUT_RESULT_DATA;
+						transmit_index <= 0;
+
+						uart_data_tx <= transmit_buffer[0];
+						uart_have_data_tx <= 1'b1;
+						uart_tx_started <= 1'b1;
+					end
+				end
+			end else if (state == `STATE_TRANSMIT_OUTPUT_RESULT_DATA) begin
+				if (uart_tx_started) begin
+					if (uart_transmitting) begin
+						uart_tx_started <= 1'b0;
+					end
+				end else begin
+					if (!uart_transmitting) begin
+						if ((transmit_index + 1) == transmit_count) begin
+							// that was the last byte, we're done
+							state <= `STATE_COMMAND;
+							transmit_index <= 0;
+						end else begin
+							// still have more bytes to transmit
+							state <= `STATE_TRANSMIT_OUTPUT_RESULT_DATA;
+							transmit_index <= transmit_index + 1;
+
+							uart_data_tx <= transmit_buffer[transmit_index + 1];
+							uart_have_data_tx <= 1'b1;
+							uart_tx_started <= 1'b1;
+						end
 					end
 				end
 			end
