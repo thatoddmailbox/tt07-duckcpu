@@ -14,6 +14,10 @@ module soc(
 	output wire uart0_txd_out
 );
 
+	//
+	// main cpu
+	//
+
 	wire [15:0] bus_address_out;
 	wire [7:0] bus_data_out;
 	wire [7:0] bus_data_in;
@@ -31,6 +35,21 @@ module soc(
 		.bus_write(bus_write),
 		.bus_wait(bus_wait)
 	);
+
+	//
+	// mapping logic
+	//
+
+	// memory map
+	// 0x0000 - 0x7FFF: SPI flash
+	// 0x8000 - 0xFEFF: SPI RAM
+	// 0xFF00 - 0xFFFF: register space
+	wire bus_access_register = (bus_address_out[15:8] == 8'hFF);
+	wire bus_access_uart0 = (bus_address_out[7:4] == 4'h0);
+
+	//
+	// rspi (reserved SPI)
+	//
 
 	wire [7:0] rspi_data_tx;
 	wire [7:0] rspi_data_rx;
@@ -55,6 +74,10 @@ module soc(
 		.txn_done(rspi_txn_done),
 		.force_clock(rspi_force_clock)
 	);
+
+	//
+	// uart0
+	//
 
 	wire [11:0] uart0_divider;
 
@@ -109,18 +132,19 @@ module soc(
 		.uart_data_rx_ack(uart0_data_rx_ack)
 	);
 
-	// memory map
-	// 0x0000 - 0x7FFF: SPI flash
-	// 0x8000 - 0xFEFF: SPI RAM
-	// 0xFF00 - 0xFFFF: register space
-	wire bus_access_register = (bus_address_out[15:8] == 8'hFF);
-	wire bus_access_uart0 = (bus_address_out[7:4] == 4'h0);
+	//
+	// mapping logic part 2
+	//
 
 	wire memory_bus_wait;
 	wire [7:0] memory_bus_in;
 
 	wire [7:0] register_bus_data_in = (bus_access_uart0 ? uart0_bus_data_rx : 8'h00);
 	wire register_bus_wait = (bus_access_uart0 ? uart0_bus_wait : 1'b0);
+
+	//
+	// memory controller
+	//
 
 	mem_ctrl mem_ctrl_inst(
 		.clk(clk),
@@ -145,53 +169,5 @@ module soc(
 
 	assign bus_data_in = (bus_access_register ? register_bus_data_in : memory_bus_in);
 	assign bus_wait = (bus_access_register ? register_bus_wait : memory_bus_wait);
-
-	always @(posedge clk) begin
-		if (!rst_n) begin
-			// reset stuff
-			// bus_completed <= 0;
-		end else begin
-			// if (bus_read) begin
-			// 	// read from bus
-
-			// 	// // TODO: something more fun
-			// 	// if (bus_address_out == 16'd0) begin
-			// 	// 	bus_data_in <= 8'h3E; // LD A, d8
-			// 	// end else if (bus_address_out == 16'd1) begin
-			// 	// 	bus_data_in <= 8'h3;
-			// 	// end else if (bus_address_out == 16'd2) begin
-			// 	// 	bus_data_in <= 8'h26; // LD H, d8
-			// 	// end else if (bus_address_out == 16'd3) begin
-			// 	// 	bus_data_in <= 8'hFF;
-			// 	// end else if (bus_address_out == 16'd4) begin
-			// 	// 	bus_data_in <= 8'h2E; // LD L, d8
-			// 	// end else if (bus_address_out == 16'd5) begin
-			// 	// 	bus_data_in <= 8'h00;
-			// 	// end else if (bus_address_out == 16'd6) begin
-			// 	// 	bus_data_in <= 8'h3D; // DEC A
-			// 	// end else if (bus_address_out == 16'd7) begin
-			// 	// 	bus_data_in <= 8'h77; // LD [HL], A
-			// 	// end else if (bus_address_out == 16'd8) begin
-			// 	// 	bus_data_in <= 8'hC2; // JP nz, a16
-			// 	// end else if (bus_address_out == 16'd9) begin
-			// 	// 	bus_data_in <= 8'h06; // lower byte
-			// 	// end else if (bus_address_out == 16'd10) begin
-			// 	// 	bus_data_in <= 8'h00; // upper byte
-			// 	// end else begin
-			// 	// 	bus_data_in <= 8'h00; // NOP
-			// 	// end
-
-			// 	bus_completed <= 1;
-			// end else if (bus_write) begin
-			// 	// write to bus
-
-			// 	// TODO: don't just ignore it
-
-			// 	bus_completed <= 1;
-			// end else begin
-			// 	bus_completed <= 0;
-			// end
-		end
-	end
 
 endmodule
