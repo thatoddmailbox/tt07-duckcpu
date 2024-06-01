@@ -8,7 +8,10 @@ module soc(
 	output wire spi_mosi,
 	input wire spi_miso,
 	output wire spi_flash_ce_n,
-	output wire spi_ram_ce_n
+	output wire spi_ram_ce_n,
+
+	input wire uart0_rxd_in,
+	output wire uart0_txd_out
 );
 
 	wire [15:0] bus_address_out;
@@ -51,6 +54,22 @@ module soc(
 		.txn_start(rspi_txn_start),
 		.txn_done(rspi_txn_done),
 		.force_clock(rspi_force_clock)
+	);
+
+	uart_core uart0_inst(
+		.clk(clk),
+		.rst_n(rst_n),
+
+		.rxd_in(uart0_rxd_in),
+		.txd_out(uart0_txd_out),
+
+		.data_tx(8'h55),
+		.have_data_tx(1'b1),
+		.transmitting(),
+
+		.data_rx(),
+		.have_data_rx(),
+		.data_rx_ack(1'b1)
 	);
 
 	// memory map

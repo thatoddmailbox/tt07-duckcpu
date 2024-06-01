@@ -34,7 +34,10 @@ module top_level(
 	output wire ck_io41
 );
 
-	assign uart_rxd_out = uart_txd_in;
+	wire uart0_txd_out;
+
+	assign uart_rxd_out = uart0_txd_out; //uo_out[3];
+	assign ck_io29 = uart0_txd_out;
 
 	wire clk_50mhz;
 	clk_wiz_0 clk_inst(
@@ -56,7 +59,7 @@ module top_level(
 	// TODO fix uio stuff
 	tt_um_thatoddmailbox tt_module(
 		.ui_in({ck_io7, ck_io6, ck_io5, ck_io4, ck_io3, ck_io2, ck_io1, ck_io0}),
-		.uo_out({ck_io33, ck_io32, ck_io31, ck_io30, ck_io29, ck_io28, ck_io27, ck_io26}),
+		.uo_out({ck_io33, ck_io32, ck_io31, ck_io30, uart0_txd_out, ck_io28, ck_io27, ck_io26}),
 		.uio_in(8'h00),
 		.uio_out({ck_io41, ck_io40, ck_io39, ck_io38, ck_io37, ck_io36, ck_io35, ck_io34}),
 		.uio_oe(),

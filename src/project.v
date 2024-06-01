@@ -17,7 +17,7 @@ module tt_um_thatoddmailbox (
 );
 
 	// All output pins must be assigned. If not used, assign to 0.
-	assign uo_out[3:0] = 4'h0; //ui_in + uio_in;  // Example: ou_out is the sum of ui_in and uio_in
+	assign uo_out[2:0] = 0; //ui_in + uio_in;  // Example: ou_out is the sum of ui_in and uio_in
 	assign uio_out = 0;
 	assign uio_oe  = 0;
 
@@ -29,7 +29,10 @@ module tt_um_thatoddmailbox (
 		.spi_mosi(uo_out[5]),
 		.spi_miso(ui_in[7]),
 		.spi_flash_ce_n(uo_out[7]),
-		.spi_ram_ce_n(uo_out[4])
+		.spi_ram_ce_n(uo_out[4]),
+
+		.uart0_rxd_in(ui_in[6]),
+		.uart0_txd_out(uo_out[3])
 	);
 
 endmodule

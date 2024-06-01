@@ -41,6 +41,9 @@ module tb ();
       .rst_n  (rst_n)     // not reset
   );
 
+  // uart loopback
+  assign ui_in[6] = uo_out[3];
+
   wire flash_ce = uo_out[7];
   wire ram_ce = uo_out[4];
 
