@@ -21,7 +21,7 @@ module spi_core(
 
 	reg [7:0] tx_buf;
 	reg active;
-	reg [2:0] bit_count;
+	reg [3:0] bit_count;
 
 	reg forcing_clock;
 	reg forcing_clock_did_first;
@@ -32,7 +32,7 @@ module spi_core(
 		if (!rst_n) begin
 			tx_buf <= 8'h00;
 			active <= 1'b0;
-			bit_count <= 3'b0;
+			bit_count <= 4'b0;
 
 			forcing_clock <= 1'b0;
 			forcing_clock_did_first <= 1'b0;
@@ -46,9 +46,12 @@ module spi_core(
 		end else begin
 			if (!active) begin
 				if (txn_start) begin
-					tx_buf <= data_tx;
 					active <= 1'b1;
-					bit_count <= 3'b0;
+					bit_count <= 4'b0;
+
+					// set mosi to the first bit, in preparation for the first rising edge
+					spi_mosi <= data_tx[7];
+					tx_buf <= {data_tx[6:0], 1'b0};
 				end else if (force_clock) begin
 					active <= 1'b1;
 					forcing_clock <= 1'b1;
@@ -58,30 +61,38 @@ module spi_core(
 				counter <= counter + 1;
 
 				if (counter == divider) begin
-					spi_clk <= ~spi_clk;
 					counter <= 0;
 
-					if (forcing_clock) begin
-						if (spi_clk == 1'b1) begin
-							forcing_clock_did_first <= 1'b1;
-						end else if (spi_clk == 1'b0 && forcing_clock_did_first) begin
-							// we did it, go back to normal
-							active <= 1'b0;
-							forcing_clock <= 1'b0;
-							spi_clk <= 1'b0;
-						end
+					if (!forcing_clock && spi_clk == 1'b0 && bit_count == 4'h8) begin
+						// we are done
+						active <= 1'b0;
 					end else begin
-						if (spi_clk == 1'b0) begin
-							// we just made the clk go up, so we should shift out the next bit
-							// TODO: cpha bit???
-							tx_buf <= {tx_buf[6:0], 1'b0};
-							spi_mosi <= tx_buf[7];
-							bit_count <= bit_count + 1;
-						end else begin
-							// we just made the clk go down, so we should read in the next bit
-							data_rx <= {data_rx[6:0], spi_miso};
-							if (bit_count == 3'h0) begin
+						spi_clk <= ~spi_clk;
+
+						if (forcing_clock) begin
+							if (spi_clk == 1'b1) begin
+								forcing_clock_did_first <= 1'b1;
+							end else if (spi_clk == 1'b0 && forcing_clock_did_first) begin
+								// we did it, go back to normal
 								active <= 1'b0;
+								forcing_clock <= 1'b0;
+								spi_clk <= 1'b0;
+							end
+						end else begin
+							if (spi_clk == 1'b1) begin
+								// we just made the clk go down
+
+								// read in the next bit
+								// TODO: HACK: this feels wrong...we are claiming CPHA = 0, but we are kinda reading on the falling edge??
+								// but also I guess this is happening before the edge falls?
+								// is this legal???? probably depends on the device??? there isn't really a spi standard :(
+								data_rx <= {data_rx[6:0], spi_miso};
+								bit_count <= bit_count + 1;
+
+								// shift out the next bit, in anticipation of the next rising edge
+								// TODO: cpha bit???
+								tx_buf <= {tx_buf[6:0], 1'b0};
+								spi_mosi <= tx_buf[7];
 							end
 						end
 					end
