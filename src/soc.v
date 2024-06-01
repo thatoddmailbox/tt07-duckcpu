@@ -14,6 +14,8 @@ module soc(
 	output wire uart0_txd_out
 );
 
+	reg bootloader_active = 1'b0;
+
 	//
 	// main cpu
 	//
@@ -47,6 +49,15 @@ module soc(
 	wire bus_access_register = (bus_address_out[15:8] == 8'hFF);
 	wire bus_access_uart0 = (bus_address_out[7:4] == 4'h0);
 
+	wire memory_bus_wait;
+	wire [7:0] memory_bus_in;
+
+	wire [7:0] uart0_bus_data_rx;
+	wire uart0_bus_wait;
+
+	wire [7:0] register_bus_data_in = (bus_access_uart0 ? uart0_bus_data_rx : 8'h00);
+	wire register_bus_wait = (bus_access_uart0 ? uart0_bus_wait : 1'b0);
+
 	//
 	// rspi (reserved SPI)
 	//
@@ -73,6 +84,87 @@ module soc(
 		.txn_start(rspi_txn_start),
 		.txn_done(rspi_txn_done),
 		.force_clock(rspi_force_clock)
+	);
+
+	//
+	// rspi mapping
+	//
+
+	assign rspi_data_tx = (bootloader_active ? bootloader_rspi_data_tx : memory_rspi_data_tx);
+	assign rspi_txn_start = (bootloader_active ? bootloader_rspi_txn_start : memory_rspi_txn_start);
+	assign rspi_force_clock = (bootloader_active ? bootloader_rspi_force_clock : memory_rspi_force_clock);
+
+	assign spi_flash_ce_n = (bootloader_active ? bootloader_spi_flash_ce_n : memory_spi_flash_ce_n);
+	assign spi_ram_ce_n = (bootloader_active ? bootloader_spi_ram_ce_n : memory_spi_ram_ce_n);
+
+	//
+	// memory controller
+	//
+
+	wire [7:0] memory_rspi_data_tx;
+	wire memory_rspi_txn_start;
+	wire memory_rspi_force_clock;
+
+	wire memory_spi_flash_ce_n;
+	wire memory_spi_ram_ce_n;
+
+	mem_ctrl mem_ctrl_inst(
+		.clk(clk),
+		.rst_n(rst_n),
+
+		.bus_address(bus_address_out),
+		.bus_data_tx(bus_data_out),
+		.bus_data_rx(memory_bus_in),
+		.bus_read(bus_read & !bus_access_register),
+		.bus_write(bus_write & !bus_access_register),
+		.bus_wait(memory_bus_wait),
+
+		.spi_data_tx(memory_rspi_data_tx),
+		.spi_data_rx(!bootloader_active ? rspi_data_rx : 8'h00),
+		.spi_txn_start(memory_rspi_txn_start),
+		.spi_txn_done(!bootloader_active ? rspi_txn_done : 1'b0),
+		.spi_force_clock(memory_rspi_force_clock),
+
+		.spi_flash_ce_n(memory_spi_flash_ce_n),
+		.spi_ram_ce_n(memory_spi_ram_ce_n)
+	);
+
+	assign bus_data_in = (bus_access_register ? register_bus_data_in : memory_bus_in);
+	assign bus_wait = (bus_access_register ? register_bus_wait : memory_bus_wait);
+
+	//
+	// bootloader
+	//
+
+	wire [7:0] bootloader_rspi_data_tx;
+	wire bootloader_rspi_txn_start;
+	wire bootloader_rspi_force_clock;
+
+	wire bootloader_spi_flash_ce_n;
+	wire bootloader_spi_ram_ce_n;
+
+	bootloader bootloader_inst(
+		.clk(clk),
+		.rst_n(rst_n),
+
+		.spi_data_tx(bootloader_rspi_data_tx),
+		.spi_data_rx(bootloader_active ? rspi_data_rx : 8'h00),
+		.spi_txn_start(bootloader_rspi_txn_start),
+		.spi_txn_done(bootloader_active ? rspi_txn_done : 1'b0),
+		.spi_force_clock(bootloader_rspi_force_clock),
+
+		.spi_flash_ce_n(bootloader_spi_flash_ce_n),
+		.spi_ram_ce_n(bootloader_spi_ram_ce_n),
+
+		.uart_divider(),
+
+		.uart_data_tx(),
+		.uart_have_data_tx(),
+		.uart_transmitting(),
+
+		.uart_data_rx(),
+		.uart_have_data_rx(),
+		.uart_data_rx_ack()
 	);
 
 	//
@@ -107,9 +199,6 @@ module soc(
 		.data_rx_ack(uart0_data_rx_ack)
 	);
 
-	wire [7:0] uart0_bus_data_rx;
-	wire uart0_bus_wait;
-
 	uart_wrapper uart0_wrapper(
 		.clk(clk),
 		.rst_n(rst_n),
@@ -131,43 +220,5 @@ module soc(
 		.uart_have_data_rx(uart0_have_data_rx),
 		.uart_data_rx_ack(uart0_data_rx_ack)
 	);
-
-	//
-	// mapping logic part 2
-	//
-
-	wire memory_bus_wait;
-	wire [7:0] memory_bus_in;
-
-	wire [7:0] register_bus_data_in = (bus_access_uart0 ? uart0_bus_data_rx : 8'h00);
-	wire register_bus_wait = (bus_access_uart0 ? uart0_bus_wait : 1'b0);
-
-	//
-	// memory controller
-	//
-
-	mem_ctrl mem_ctrl_inst(
-		.clk(clk),
-		.rst_n(rst_n),
-
-		.bus_address(bus_address_out),
-		.bus_data_tx(bus_data_out),
-		.bus_data_rx(memory_bus_in),
-		.bus_read(bus_read & !bus_access_register),
-		.bus_write(bus_write & !bus_access_register),
-		.bus_wait(memory_bus_wait),
-
-		.spi_data_tx(rspi_data_tx),
-		.spi_data_rx(rspi_data_rx),
-		.spi_txn_start(rspi_txn_start),
-		.spi_txn_done(rspi_txn_done),
-		.spi_force_clock(rspi_force_clock),
-
-		.spi_flash_ce_n(spi_flash_ce_n),
-		.spi_ram_ce_n(spi_ram_ce_n)
-	);
-
-	assign bus_data_in = (bus_access_register ? register_bus_data_in : memory_bus_in);
-	assign bus_wait = (bus_access_register ? register_bus_wait : memory_bus_wait);
 
 endmodule
