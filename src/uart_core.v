@@ -12,6 +12,8 @@ module uart_core(
 	input wire rxd_in,
 	output reg txd_out,
 
+	input wire [11:0] divider,
+
 	input wire [7:0] data_tx,
 	input wire have_data_tx,
 	output wire transmitting,
@@ -20,8 +22,6 @@ module uart_core(
 	output reg have_data_rx,
 	input wire data_rx_ack
 );
-
-	reg [11:0] divider;
 
 	reg [11:0] tx_counter;
 
@@ -46,8 +46,6 @@ module uart_core(
 			txd_out <= 1'b1;
 			data_rx <= 8'h00;
 			have_data_rx <= 1'b0;
-
-			divider <= 434; // 115200 baud
 
 			tx_counter <= 0;
 

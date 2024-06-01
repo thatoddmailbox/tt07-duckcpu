@@ -16,6 +16,8 @@ module uart_wrapper(
 	input wire bus_write,
 	output wire bus_wait,
 
+	output reg [11:0] uart_divider,
+
 	output reg [7:0] uart_data_tx,
 	output reg uart_have_data_tx,
 	input wire uart_transmitting,
@@ -41,12 +43,16 @@ module uart_wrapper(
 	// TODO: implement divider
 	assign bus_data_rx = (bus_address == `REGISTER_STATUS) ? status_register :
 		(bus_address == `REGISTER_DATA) ? uart_data_rx :
-		(bus_address == `REGISTER_DIVIDER_LOW) ? 8'h00 :
-		(bus_address == `REGISTER_DIVIDER_HIGH) ? 8'h00 :
+		(bus_address == `REGISTER_DIVIDER_LOW) ? uart_divider[7:0] :
+		(bus_address == `REGISTER_DIVIDER_HIGH) ? {4'h0, uart_divider[11:8]} :
 		8'h00;
 
 	always @(posedge clk) begin
 		if (!rst_n) begin
+			// TODO: would be cool if we could support autobauding
+			// this would be useful for the bootloader
+			uart_divider <= 434; // 115200 baud @ 50 MHz system clock
+
 			uart_data_tx <= 8'h00;
 			uart_have_data_tx <= 1'b0;
 			uart_data_rx_ack <= 1'b0;
@@ -80,10 +86,10 @@ module uart_wrapper(
 						end
 					end
 					`REGISTER_DIVIDER_LOW: begin
-						// TODO: implement
+						uart_divider[7:0] <= bus_data_tx;
 					end
 					`REGISTER_DIVIDER_HIGH: begin
-						// TODO: implement
+						uart_divider[11:8] <= bus_data_tx[3:0];
 					end
 				endcase
 			end

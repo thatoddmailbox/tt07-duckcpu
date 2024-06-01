@@ -56,6 +56,8 @@ module soc(
 		.force_clock(rspi_force_clock)
 	);
 
+	wire [11:0] uart0_divider;
+
 	wire [7:0] uart0_data_tx;
 	wire uart0_have_data_tx;
 	wire uart0_transmitting;
@@ -70,6 +72,8 @@ module soc(
 
 		.rxd_in(uart0_rxd_in),
 		.txd_out(uart0_txd_out),
+
+		.divider(uart0_divider),
 
 		.data_tx(uart0_data_tx),
 		.have_data_tx(uart0_have_data_tx),
@@ -93,6 +97,8 @@ module soc(
 		.bus_read(bus_access_uart0 ? bus_read : 1'b0),
 		.bus_write(bus_access_uart0 ? bus_write : 1'b0),
 		.bus_wait(uart0_bus_wait),
+
+		.uart_divider(uart0_divider),
 
 		.uart_data_tx(uart0_data_tx),
 		.uart_have_data_tx(uart0_have_data_tx),
