@@ -30,6 +30,9 @@ module soc(
 	cpu cpu_inst(
 		.clk(clk),
 		.rst_n(rst_n),
+
+		.active(!bootloader_active),
+
 		.bus_address_out(bus_address_out),
 		.bus_data_out(bus_data_out),
 		.bus_data_in(bus_data_in),
@@ -146,6 +149,8 @@ module soc(
 	bootloader bootloader_inst(
 		.clk(clk),
 		.rst_n(rst_n),
+
+		.active(bootloader_active),
 
 		.spi_data_tx(bootloader_rspi_data_tx),
 		.spi_data_rx(bootloader_active ? rspi_data_rx : 8'h00),

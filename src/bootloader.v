@@ -4,7 +4,9 @@ module bootloader(
 	input wire clk,
 	input wire rst_n,
 
-	output wire [7:0] spi_data_tx,
+	input wire active,
+
+	output reg [7:0] spi_data_tx,
 	input wire [7:0] spi_data_rx,
 	output reg spi_txn_start,
 	input wire spi_txn_done,

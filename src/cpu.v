@@ -21,6 +21,8 @@ module cpu(
 	input wire clk,
 	input wire rst_n,
 
+	input wire active,
+
 	output reg [15:0] bus_address_out,
 	output reg [7:0] bus_data_out,
 	input wire [7:0] bus_data_in,
@@ -175,7 +177,7 @@ module cpu(
 			alu_operand_a <= 8'h00;
 			alu_operand_b <= 8'h00;
 			alu_operator <= `ALU_OP_NOP;
-		end else begin
+		end else if (active) begin
 			if (state == `STATE_INSN_FETCH) begin
 				$display("insn fetch");
 				$display("want_bus_read: %b", want_bus_read);
