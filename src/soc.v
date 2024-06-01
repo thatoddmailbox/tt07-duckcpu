@@ -114,7 +114,7 @@ module soc(
 `ifdef SIM
 		.divider(8'd0),
 `else
-		.divider(8'd25),
+		.divider(spi0_divider),
 `endif
 		.spi_clk(rspi_clk),
 		.spi_mosi(rspi_mosi),
