@@ -54,6 +54,7 @@ module bootloader(
 	reg [7:0] transmit_count;
 
 	reg just_handled_rx;
+	reg spi_started;
 
 	always @(posedge clk) begin
 		if (!rst_n) begin
@@ -71,6 +72,7 @@ module bootloader(
 			state <= `STATE_COMMAND;
 			transmit_count <= 8'h00;
 			just_handled_rx <= 1'b0;
+			spi_started <= 1'b0;
 		end else if (active) begin
 			if (uart_have_data_rx && !just_handled_rx && !uart_transmitting) begin
 				uart_data_rx_ack <= 1'b1;
@@ -120,22 +122,32 @@ module bootloader(
 				end else if (state == `STATE_TRANSMIT_WAIT_FOR_DATA) begin
 					spi_data_tx <= uart_data_rx;
 					spi_txn_start <= 1'b1;
+					spi_started <= 1'b0;
 					state <= `STATE_TRANSMIT_WAIT_FOR_SPI;
 				end
 			end
 
-			if (state == `STATE_TRANSMIT_WAIT_FOR_SPI && spi_txn_done) begin
-				transmit_count <= transmit_count - 1;
+			if (state == `STATE_TRANSMIT_WAIT_FOR_SPI) begin
+				if (spi_started) begin
+					if (spi_txn_done) begin
+						transmit_count <= transmit_count - 1;
 
-				uart_data_tx <= spi_data_rx;
-				uart_have_data_tx <= 1'b1;
+						uart_data_tx <= spi_data_rx;
+						uart_have_data_tx <= 1'b1;
 
-				if (transmit_count == 8'h01) begin
-					// that was the last byte, we're done
-					state <= `STATE_COMMAND;
+						if (transmit_count == 8'h01) begin
+							// that was the last byte, we're done
+							state <= `STATE_COMMAND;
+						end else begin
+							// still have more bytes to transmit
+							state <= `STATE_TRANSMIT_WAIT_FOR_DATA;
+						end
+					end
 				end else begin
-					// still have more bytes to transmit
-					state <= `STATE_TRANSMIT_WAIT_FOR_DATA;
+					if (!spi_txn_done) begin
+						spi_txn_start <= 1'b0;
+						spi_started <= 1'b1;
+					end
 				end
 			end
 
