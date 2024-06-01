@@ -4,17 +4,32 @@ module soc(
 	input wire clk,
 	input wire rst_n,
 
-	output wire spi_clk,
-	output wire spi_mosi,
-	input wire spi_miso,
-	output wire spi_flash_ce_n,
-	output wire spi_ram_ce_n,
+	input wire bootsel,
+
+	output wire rspi_clk,
+	output wire rspi_mosi,
+	input wire rspi_miso,
+	output wire rspi_flash_ce_n,
+	output wire rspi_ram_ce_n,
 
 	input wire uart0_rxd_in,
-	output wire uart0_txd_out
+	output wire uart0_txd_out,
+
+	output wire spi0_clk,
+	output wire spi0_mosi,
+	input wire spi0_miso,
+	output wire spi0_ce_n
 );
 
-	reg bootloader_active = 1'b0;
+	reg bootloader_active;
+
+	always @(posedge clk) begin
+		if (!rst_n) begin
+			bootloader_active <= 1'b0;
+		end else begin
+			bootloader_active <= bootsel ? 1'b0 : 1'b1;
+		end
+	end
 
 	//
 	// main cpu
