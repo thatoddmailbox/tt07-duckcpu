@@ -24,6 +24,7 @@ project:
     - "soc.v"
     - "spi_core.v"
     - "uart_core.v"
+    - "uart_wrapper.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
