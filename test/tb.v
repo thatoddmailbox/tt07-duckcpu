@@ -42,7 +42,12 @@ module tb ();
   );
 
   // uart loopback
-  assign ui_in[6] = uo_out[3];
+  // assign ui_in[6] = uo_out[3];
+  reg lol = 1'b1;
+  always @(posedge clk) begin
+    lol <= ~lol;
+  end
+  assign ui_in[6] = lol;
 
   wire flash_ce = uo_out[7];
   wire ram_ce = uo_out[4];

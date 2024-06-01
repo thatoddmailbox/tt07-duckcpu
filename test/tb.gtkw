@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sat Jun  1 08:49:06 2024
+[*] Sat Jun  1 14:16:46 2024
 [*]
 [dumpfile] "/home/alex/Documents/GitHub/tt07-duckcpu/test/tb.vcd"
-[dumpfile_mtime] "Sat Jun  1 08:48:34 2024"
-[dumpfile_size] 772709
+[dumpfile_mtime] "Sat Jun  1 14:16:23 2024"
+[dumpfile_size] 987981
 [savefile] "/home/alex/Documents/GitHub/tt07-duckcpu/test/tb.gtkw"
-[timestart] 3200000000
+[timestart] 0
 [size] 2560 1372
-[pos] 2383 534
-*-31.534533 18250000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] 2341 525
+*-25.534533 150000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] tb.
 [treeopen] tb.user_project.
 [treeopen] tb.user_project.soc_inst.
@@ -109,12 +109,13 @@ tb.user_project.soc_inst.uart0_inst.rxd_in
 tb.user_project.soc_inst.uart0_inst.data_tx[7:0]
 @28
 tb.user_project.soc_inst.uart0_inst.have_data_tx
-@29
 tb.user_project.soc_inst.uart0_inst.transmitting
 @22
 tb.user_project.soc_inst.uart0_inst.data_rx[7:0]
 @28
 tb.user_project.soc_inst.uart0_inst.have_data_rx
+tb.user_project.soc_inst.bootloader_inst.uart_have_data_rx
+tb.user_project.soc_inst.bootloader_inst.uart_have_data_tx
 @200
 -Memory controller
 @22
