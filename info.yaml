@@ -23,6 +23,7 @@ project:
     - "project.v"
     - "soc.v"
     - "spi_core.v"
+    - "spi_wrapper.v"
     - "uart_core.v"
     - "uart_wrapper.v"
 
@@ -46,7 +47,7 @@ pinout:
   uo[4]: "uart0_tx"
   uo[5]: "spi0_clk"
   uo[6]: "spi0_mosi"
-  uo[7]: "spi0_cs"
+  uo[7]: "spi0_ce_n"
 
   # Bidirectional pins
   uio[0]: ""

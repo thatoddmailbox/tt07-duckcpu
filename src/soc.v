@@ -66,6 +66,7 @@ module soc(
 	// 0xFF00 - 0xFFFF: register space
 	wire bus_access_register = (bus_address_out[15:8] == 8'hFF);
 	wire bus_access_uart0 = (bus_address_out[7:4] == 4'h0);
+	wire bus_access_spi0 = (bus_address_out[7:4] == 4'h1);
 
 	wire memory_bus_wait;
 	wire [7:0] memory_bus_in;
@@ -73,8 +74,19 @@ module soc(
 	wire [7:0] uart0_bus_data_rx;
 	wire uart0_bus_wait;
 
-	wire [7:0] register_bus_data_in = (bus_access_uart0 ? uart0_bus_data_rx : 8'h00);
-	wire register_bus_wait = (bus_access_uart0 ? uart0_bus_wait : 1'b0);
+	wire [7:0] spi0_bus_data_rx;
+	wire spi0_bus_wait;
+
+	wire [7:0] register_bus_data_in = (
+		bus_access_uart0 ? uart0_bus_data_rx :
+		bus_access_spi0 ? spi0_bus_data_rx :
+		8'h00
+	);
+	wire register_bus_wait = (
+		bus_access_uart0 ? uart0_bus_wait :
+		bus_access_spi0 ? spi0_bus_wait :
+		1'b0
+	);
 
 	//
 	// rspi (reserved SPI)
@@ -247,5 +259,53 @@ module soc(
 		.uart_have_data_rx(!bootloader_active ? uart0_have_data_rx : 1'b0),
 		.uart_data_rx_ack(wrapper_uart0_data_rx_ack)
 	);
+
+	//
+	// spi0
+	//
+
+	wire [7:0] spi0_divider;
+
+	wire [7:0] spi0_data_tx;
+	wire [7:0] spi0_data_rx;
+	wire spi0_txn_start;
+	wire spi0_txn_done;
+	wire spi0_force_clock;
+
+	spi_core spi0_inst(
+		.clk(clk),
+		.rst_n(rst_n),
+		.divider(spi0_divider),
+		.spi_clk(spi0_clk),
+		.spi_mosi(spi0_mosi),
+		.spi_miso(spi0_miso),
+		.data_tx(spi0_data_tx),
+		.data_rx(spi0_data_rx),
+		.txn_start(spi0_txn_start),
+		.txn_done(spi0_txn_done),
+		.force_clock(spi0_force_clock)
+	);
+
+	spi_wrapper spi0_wrapper(
+		.clk(clk),
+		.rst_n(rst_n),
+
+		.bus_address(bus_address_out[1:0]),
+		.bus_data_tx(bus_data_out),
+		.bus_data_rx(spi0_bus_data_rx),
+		.bus_read(bus_access_spi0 ? bus_read : 1'b0),
+		.bus_write(bus_access_spi0 ? bus_write : 1'b0),
+		.bus_wait(spi0_bus_wait),
+
+		.spi_divider(spi0_divider),
+
+		.spi_data_tx(spi0_data_tx),
+		.spi_data_rx(spi0_data_rx),
+		.spi_txn_start(spi0_txn_start),
+		.spi_txn_done(spi0_txn_done),
+		.spi_force_clock(spi0_force_clock),
+		.spi_ce_n(spi0_ce_n)
+	);
+
 
 endmodule
