@@ -71,7 +71,7 @@ module soc(
 	wire rspi_txn_done;
 	wire rspi_force_clock;
 
-	spi_core spi_inst(
+	spi_core rspi_inst(
 		.clk(clk),
 		.rst_n(rst_n),
 `ifdef SIM
@@ -79,9 +79,9 @@ module soc(
 `else
 		.divider(5'd25),
 `endif
-		.spi_clk(spi_clk),
-		.spi_mosi(spi_mosi),
-		.spi_miso(spi_miso),
+		.spi_clk(rspi_clk),
+		.spi_mosi(rspi_mosi),
+		.spi_miso(rspi_miso),
 		.data_tx(rspi_data_tx),
 		.data_rx(rspi_data_rx),
 		.txn_start(rspi_txn_start),
@@ -97,8 +97,8 @@ module soc(
 	assign rspi_txn_start = (bootloader_active ? bootloader_rspi_txn_start : memory_rspi_txn_start);
 	assign rspi_force_clock = (bootloader_active ? bootloader_rspi_force_clock : memory_rspi_force_clock);
 
-	assign spi_flash_ce_n = (bootloader_active ? bootloader_spi_flash_ce_n : memory_spi_flash_ce_n);
-	assign spi_ram_ce_n = (bootloader_active ? bootloader_spi_ram_ce_n : memory_spi_ram_ce_n);
+	assign rspi_flash_ce_n = (bootloader_active ? bootloader_spi_flash_ce_n : memory_spi_flash_ce_n);
+	assign rspi_ram_ce_n = (bootloader_active ? bootloader_spi_ram_ce_n : memory_spi_ram_ce_n);
 
 	//
 	// memory controller

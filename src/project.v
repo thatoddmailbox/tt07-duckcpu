@@ -1,8 +1,3 @@
-/*
- * Copyright (c) 2024 Your Name
- * SPDX-License-Identifier: Apache-2.0
- */
-
 `default_nettype none
 
 module tt_um_thatoddmailbox (
@@ -25,11 +20,11 @@ module tt_um_thatoddmailbox (
 		.clk(clk),
 		.rst_n(rst_n),
 
-		.spi_clk(uo_out[6]),
-		.spi_mosi(uo_out[5]),
-		.spi_miso(ui_in[7]),
-		.spi_flash_ce_n(uo_out[7]),
-		.spi_ram_ce_n(uo_out[4]),
+		.rspi_clk(uo_out[6]),
+		.rspi_mosi(uo_out[5]),
+		.rspi_miso(ui_in[7]),
+		.rspi_flash_ce_n(uo_out[7]),
+		.rspi_ram_ce_n(uo_out[4]),
 
 		.uart0_rxd_in(ui_in[6]),
 		.uart0_txd_out(uo_out[3])

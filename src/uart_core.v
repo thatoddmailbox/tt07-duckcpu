@@ -7,7 +7,7 @@
 
 // how many cycles we need to see RXD low before we're convinced that we're seeing a start bit
 `ifdef SIM
-`define RXD_LOW_THRESHOLD 4'hD0
+`define RXD_LOW_THRESHOLD 4'h0
 `else
 `define RXD_LOW_THRESHOLD 4'd10
 `endif
