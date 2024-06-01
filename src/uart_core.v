@@ -81,7 +81,7 @@ module uart_core(
 						end
 						`STATE_DATA: begin
 							txd_out <= tx_buf[0];
-							tx_buf <= {1'b0, tx_buf[6:1]};
+							tx_buf <= {1'b0, tx_buf[7:1]};
 							tx_bit_count <= tx_bit_count + 1;
 
 							if (tx_bit_count == 7) begin
