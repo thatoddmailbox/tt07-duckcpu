@@ -5,6 +5,13 @@
 `define STATE_STOP 2'h2
 `define STATE_DONE 2'h3
 
+// how many cycles we need to see RXD low before we're convinced that we're seeing a start bit
+`ifdef SIM
+`define RXD_LOW_THRESHOLD 4'hD0
+`else
+`define RXD_LOW_THRESHOLD 4'd10
+`endif
+
 module uart_core(
 	input wire clk,
 	input wire rst_n,
@@ -35,6 +42,8 @@ module uart_core(
 
 	reg [11:0] rx_counter;
 
+	reg [3:0] rx_rxd_low_count;
+
 	reg [7:0] rx_buf;
 	reg rx_active;
 	reg [3:0] rx_bit_count;
@@ -56,6 +65,8 @@ module uart_core(
 			tx_state <= `STATE_START;
 
 			rx_counter <= 0;
+
+			rx_rxd_low_count <= 0;
 
 			rx_buf <= 8'h00;
 			rx_active <= 1'b0;
@@ -143,15 +154,27 @@ module uart_core(
 						end
 					endcase
 				end
-			end else if (rxd_in == 1'b0) begin
-				// start bit!
-				rx_counter <= 0;
+			end else begin
+				if (rxd_in == 1'b0) begin
+					rx_rxd_low_count <= rx_rxd_low_count + 1;
 
-				rx_buf <= 8'h00;
-				rx_active <= 1'b1;
-				rx_bit_count <= 4'h0;
+					if (rx_rxd_low_count == `RXD_LOW_THRESHOLD) begin
+						// ok, i'm convinced it's a start bit and not a glitch
 
-				rx_state <= `STATE_DATA;
+						rx_rxd_low_count <= 0;
+
+						rx_buf <= 8'h00;
+						rx_active <= 1'b1;
+						rx_bit_count <= 4'h0;
+
+						rx_state <= `STATE_DATA;
+
+						// sneaky hack that ensure that we start sampling in the middle of the bit
+						rx_counter <= 12'hFFF - `RXD_LOW_THRESHOLD - (divider >> 1);
+					end
+				end else begin
+					rx_rxd_low_count <= 0;
+				end
 			end
 
 			if (data_rx_ack) begin
