@@ -56,6 +56,14 @@ module soc(
 		.force_clock(rspi_force_clock)
 	);
 
+	wire [7:0] uart0_data_tx;
+	wire uart0_have_data_tx;
+	wire uart0_transmitting;
+
+	wire [7:0] uart0_data_rx;
+	wire uart0_have_data_rx;
+	wire uart0_data_rx_ack;
+
 	uart_core uart0_inst(
 		.clk(clk),
 		.rst_n(rst_n),
@@ -63,13 +71,36 @@ module soc(
 		.rxd_in(uart0_rxd_in),
 		.txd_out(uart0_txd_out),
 
-		.data_tx(8'h55),
-		.have_data_tx(1'b1),
-		.transmitting(),
+		.data_tx(uart0_data_tx),
+		.have_data_tx(uart0_have_data_tx),
+		.transmitting(uart0_transmitting),
 
-		.data_rx(),
-		.have_data_rx(),
-		.data_rx_ack(1'b1)
+		.data_rx(uart0_data_rx),
+		.have_data_rx(uart0_have_data_rx),
+		.data_rx_ack(uart0_data_rx_ack)
+	);
+
+	wire [7:0] uart0_bus_data_rx;
+	wire uart0_bus_wait;
+
+	uart_wrapper uart0_wrapper(
+		.clk(clk),
+		.rst_n(rst_n),
+
+		.bus_address(bus_address_out[1:0]),
+		.bus_data_tx(bus_data_out),
+		.bus_data_rx(uart0_bus_data_rx),
+		.bus_read(bus_access_uart0 ? bus_read : 1'b0),
+		.bus_write(bus_access_uart0 ? bus_write : 1'b0),
+		.bus_wait(uart0_bus_wait),
+
+		.uart_data_tx(uart0_data_tx),
+		.uart_have_data_tx(uart0_have_data_tx),
+		.uart_transmitting(uart0_transmitting),
+
+		.uart_data_rx(uart0_data_rx),
+		.uart_have_data_rx(uart0_have_data_rx),
+		.uart_data_rx_ack(uart0_data_rx_ack)
 	);
 
 	// memory map
@@ -77,12 +108,13 @@ module soc(
 	// 0x8000 - 0xFEFF: SPI RAM
 	// 0xFF00 - 0xFFFF: register space
 	wire bus_access_register = (bus_address_out[15:8] == 8'hFF);
+	wire bus_access_uart0 = (bus_address_out[7:4] == 4'h0);
 
 	wire memory_bus_wait;
 	wire [7:0] memory_bus_in;
 
-	wire [7:0] register_bus_data_in = 8'h00;
-	wire register_bus_wait = 1'b0;
+	wire [7:0] register_bus_data_in = (bus_access_uart0 ? uart0_bus_data_rx : 8'h00);
+	wire register_bus_wait = (bus_access_uart0 ? uart0_bus_wait : 1'b0);
 
 	mem_ctrl mem_ctrl_inst(
 		.clk(clk),
