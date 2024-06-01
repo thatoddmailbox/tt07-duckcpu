@@ -21,8 +21,8 @@ module soc(
 	output wire spi0_ce_n,
 
 	input wire [7:0] gpio_in,
-	output reg [7:0] gpio_out,
-	output reg [7:0] gpio_direction
+	output wire [7:0] gpio_out,
+	output wire [7:0] gpio_direction
 );
 
 	reg bootloader_active;
