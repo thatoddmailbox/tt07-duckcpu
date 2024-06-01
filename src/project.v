@@ -11,9 +11,6 @@ module tt_um_thatoddmailbox (
 	input  wire       rst_n     // reset_n - low to reset
 );
 
-	assign uio_out = 0;
-	assign uio_oe  = 0;
-
 	soc soc_inst(
 		.clk(clk),
 		.rst_n(rst_n),
