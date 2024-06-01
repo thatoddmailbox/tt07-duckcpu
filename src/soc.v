@@ -146,6 +146,12 @@ module soc(
 	wire bootloader_spi_flash_ce_n;
 	wire bootloader_spi_ram_ce_n;
 
+	wire [11:0] bootloader_uart0_divider;
+
+	wire [7:0] bootloader_uart0_data_tx;
+	wire bootloader_uart0_have_data_tx;
+	wire bootloader_uart0_data_rx_ack;
+
 	bootloader bootloader_inst(
 		.clk(clk),
 		.rst_n(rst_n),
@@ -161,30 +167,25 @@ module soc(
 		.spi_flash_ce_n(bootloader_spi_flash_ce_n),
 		.spi_ram_ce_n(bootloader_spi_ram_ce_n),
 
-		.uart_divider(),
+		.uart_divider(bootloader_uart0_divider),
 
-		.uart_data_tx(),
-		.uart_have_data_tx(),
-		.uart_transmitting(),
+		.uart_data_tx(bootloader_uart0_data_tx),
+		.uart_have_data_tx(bootloader_uart0_have_data_tx),
+		.uart_transmitting(bootloader_active ? uart0_transmitting : 1'b0),
 
-		.uart_data_rx(),
-		.uart_have_data_rx(),
-		.uart_data_rx_ack()
+		.uart_data_rx(bootloader_active ? uart0_data_rx : 8'h00),
+		.uart_have_data_rx(bootloader_active ? uart0_have_data_rx : 1'b0),
+		.uart_data_rx_ack(bootloader_uart0_data_rx_ack)
 	);
 
 	//
 	// uart0
 	//
 
-	wire [11:0] uart0_divider;
-
-	wire [7:0] uart0_data_tx;
-	wire uart0_have_data_tx;
 	wire uart0_transmitting;
 
 	wire [7:0] uart0_data_rx;
 	wire uart0_have_data_rx;
-	wire uart0_data_rx_ack;
 
 	uart_core uart0_inst(
 		.clk(clk),
@@ -193,16 +194,22 @@ module soc(
 		.rxd_in(uart0_rxd_in),
 		.txd_out(uart0_txd_out),
 
-		.divider(uart0_divider),
+		.divider(bootloader_active ? bootloader_uart0_divider : wrapper_uart0_divider),
 
-		.data_tx(uart0_data_tx),
-		.have_data_tx(uart0_have_data_tx),
+		.data_tx(bootloader_active ? bootloader_uart0_data_tx : wrapper_uart0_data_tx),
+		.have_data_tx(bootloader_active ? bootloader_uart0_have_data_tx : wrapper_uart0_have_data_tx),
 		.transmitting(uart0_transmitting),
 
 		.data_rx(uart0_data_rx),
 		.have_data_rx(uart0_have_data_rx),
-		.data_rx_ack(uart0_data_rx_ack)
+		.data_rx_ack(bootloader_active ? bootloader_uart0_data_rx_ack : wrapper_uart0_data_rx_ack)
 	);
+
+	wire [11:0] wrapper_uart0_divider;
+
+	wire [7:0] wrapper_uart0_data_tx;
+	wire wrapper_uart0_have_data_tx;
+	wire wrapper_uart0_data_rx_ack;
 
 	uart_wrapper uart0_wrapper(
 		.clk(clk),
@@ -215,15 +222,15 @@ module soc(
 		.bus_write(bus_access_uart0 ? bus_write : 1'b0),
 		.bus_wait(uart0_bus_wait),
 
-		.uart_divider(uart0_divider),
+		.uart_divider(wrapper_uart0_divider),
 
-		.uart_data_tx(uart0_data_tx),
-		.uart_have_data_tx(uart0_have_data_tx),
-		.uart_transmitting(uart0_transmitting),
+		.uart_data_tx(wrapper_uart0_data_tx),
+		.uart_have_data_tx(wrapper_uart0_have_data_tx),
+		.uart_transmitting(!bootloader_active ? uart0_transmitting : 1'b0),
 
-		.uart_data_rx(uart0_data_rx),
-		.uart_have_data_rx(uart0_have_data_rx),
-		.uart_data_rx_ack(uart0_data_rx_ack)
+		.uart_data_rx(!bootloader_active ? uart0_data_rx : 8'h00),
+		.uart_have_data_rx(!bootloader_active ? uart0_have_data_rx : 1'b0),
+		.uart_data_rx_ack(wrapper_uart0_data_rx_ack)
 	);
 
 endmodule
