@@ -24,6 +24,7 @@ module spi_core(
 	reg [2:0] bit_count;
 
 	reg forcing_clock;
+	reg forcing_clock_did_first;
 
 	assign txn_done = !active;
 
@@ -34,6 +35,7 @@ module spi_core(
 			bit_count <= 3'b0;
 
 			forcing_clock <= 1'b0;
+			forcing_clock_did_first <= 1'b0;
 
 			counter <= 0;
 
@@ -50,7 +52,7 @@ module spi_core(
 				end else if (force_clock) begin
 					active <= 1'b1;
 					forcing_clock <= 1'b1;
-					spi_clk <= 1'b1;
+					forcing_clock_did_first <= 1'b0;
 				end
 			end else begin
 				counter <= counter + 1;
@@ -60,7 +62,9 @@ module spi_core(
 					counter <= 0;
 
 					if (forcing_clock) begin
-						if (spi_clk == 1'b0) begin
+						if (spi_clk == 1'b1) begin
+							forcing_clock_did_first <= 1'b1;
+						end else if (spi_clk == 1'b0 && forcing_clock_did_first) begin
 							// we did it, go back to normal
 							active <= 1'b0;
 							forcing_clock <= 1'b0;
