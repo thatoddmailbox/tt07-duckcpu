@@ -159,6 +159,8 @@ module cpu(
 			register_L <= 8'h00;
 			register_PC <= 16'h0000;
 
+			current_insn <= 8'h00;
+
 			bus_address_out <= 16'h0000;
 			bus_data_out <= 8'h00;
 			want_bus_read <= 0;
