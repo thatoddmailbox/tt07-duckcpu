@@ -135,9 +135,6 @@ module cpu(
 	wire alu_flag_carry;
 
 	alu alu_inst(
-		.clk(clk),
-		.rst_n(rst_n),
-
 		.operand_a(alu_operand_a),
 		.operand_b(alu_operand_b),
 

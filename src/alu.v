@@ -3,9 +3,6 @@
 `include "alu_defs.vh"
 
 module alu(
-	input wire clk,
-	input wire rst_n,
-
 	input wire [7:0] operand_a,
 	input wire [7:0] operand_b,
 
